@@ -1,0 +1,21 @@
+{
+  "name": "Inflight Rest Calculator",
+  "short_name": "RestCalc",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#2563eb",
+  "description": "A simple calculator for planning cabin crew inflight rest periods.",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192/2563eb/ffffff?text=Rest&font=inter",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://placehold.co/512x512/2563eb/ffffff?text=Rest&font=inter",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
