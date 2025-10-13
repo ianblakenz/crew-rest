@@ -52,11 +52,50 @@
             border-radius: 9999px; border: none; cursor: pointer; margin-top: 1rem; transition: all 0.2s;
         }
         .install-button:hover { background-color: #15803d; }
-        .update-button {
-            background-color: #f59e0b; color: white; font-weight: 600; padding: 0.5rem 1rem;
-            border-radius: 9999px; border: none; cursor: pointer; margin-top: 1rem; transition: all 0.2s;
+        
+        /* --- UPDATE MODAL --- */
+        .update-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            animation: fadeIn 0.3s ease;
         }
-        .update-button:hover { background-color: #d97706; }
+        .update-modal-box {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        .update-modal-box h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 0.5rem 0;
+        }
+        .update-modal-box p {
+            color: #475569;
+            margin: 0 0 1.5rem 0;
+        }
+        .update-now-btn {
+            width: 100%;
+            background-color: #f59e0b; /* amber-500 */
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .update-now-btn:hover { background-color: #d97706; }
+
 
         /* --- Form --- */
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
@@ -152,7 +191,6 @@
                     <img src="https://media.faaa.com.au/logo/faaa_logo.png" alt="FAAA Logo" class="logo">
                     <h1>Inflight Rest Calculator</h1>
                     <button id="install-btn" class="hidden install-button">Add to Home Screen</button>
-                    <button id="update-btn" class="hidden update-button">Update Available - Tap to Install</button>
                 </div>
 
                 <div id="restForm" class="form-grid">
@@ -190,7 +228,7 @@
                         <button type="button" id="force3HourBtn" class="secondary-button">Make Long Break 3 Hours</button>
                     </div>
                     <div class="form-group">
-                        <button type="button" id="calculateBtn" class="submit-button">Calculate Breaks</button>
+                        <button type="button" id="calculateBtn" class="submit-button">Calculate Schedule</button>
                     </div>
                 </div>
             </div>
@@ -220,6 +258,15 @@
         <footer class="text-center mt-4 text-xs text-slate-400">
              <p>Version 1.0.0</p>
         </footer>
+    </div>
+    
+    <!-- UPDATE MODAL -->
+    <div id="update-modal" class="hidden update-modal-overlay">
+        <div class="update-modal-box">
+            <h2>Update Available</h2>
+            <p>A new version of the app is ready. Update now to get the latest features.</p>
+            <button id="update-now-btn" class="update-now-btn">Update Now</button>
+        </div>
     </div>
     
     <script>
@@ -508,11 +555,12 @@
         // --- PWA Service Worker Registration & Update ---
         let newWorker;
 
-        function showUpdateBar() {
-            const updateBtn = document.getElementById('update-btn');
-            updateBtn.classList.remove('hidden');
-            updateBtn.addEventListener('click', () => {
-                updateBtn.textContent = 'Updating...';
+        function showUpdatePrompt() {
+            const updateModal = document.getElementById('update-modal');
+            const updateNowBtn = document.getElementById('update-now-btn');
+            updateModal.classList.remove('hidden');
+            updateNowBtn.addEventListener('click', () => {
+                updateNowBtn.textContent = 'Updating...';
                 newWorker.postMessage({ action: 'skipWaiting' });
             });
         }
@@ -545,7 +593,7 @@
                         newWorker = reg.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                showUpdateBar();
+                                showUpdatePrompt();
                             }
                         });
                     });
