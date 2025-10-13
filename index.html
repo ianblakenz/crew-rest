@@ -8,10 +8,16 @@
     <!-- PWA Manifest and Theme Color -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff"/>
-    <link rel="apple-touch-icon" href="https://placehold.co/192x192/2563eb/ffffff?text=Rest&font=inter">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/002a6c/ffffff?text=Rest&font=inter">
     
     <style>
         /* --- Basic Reset & Font --- */
+        :root {
+            --primary-color: #002a6c;
+            --primary-hover: #001f50;
+            --primary-focus-ring: #b3c2d9;
+            --primary-light-bg: #e6eaf0;
+        }
         body {
             font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
             margin: 0;
@@ -42,30 +48,15 @@
         .header .logo { display: block; margin-left: auto; margin-right: auto; height: 48px; margin-bottom: 1rem; }
         .header h1 { font-size: 1.875rem; font-weight: 700; color: #1e293b; margin: 0; }
         .install-button {
-            background-color: #16a34a; /* green-600 */
-            color: white;
-            font-weight: 600;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px; /* rounded-full */
-            border: none;
-            cursor: pointer;
-            margin-top: 1rem;
-            transition: all 0.2s;
+            background-color: #16a34a; color: white; font-weight: 600; padding: 0.5rem 1rem;
+            border-radius: 9999px; border: none; cursor: pointer; margin-top: 1rem; transition: all 0.2s;
         }
-        .install-button:hover { background-color: #15803d; /* green-700 */ }
+        .install-button:hover { background-color: #15803d; }
         .update-button {
-            background-color: #f59e0b; /* amber-500 */
-            color: white;
-            font-weight: 600;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px; /* rounded-full */
-            border: none;
-            cursor: pointer;
-            margin-top: 1rem;
-            transition: all 0.2s;
+            background-color: #f59e0b; color: white; font-weight: 600; padding: 0.5rem 1rem;
+            border-radius: 9999px; border: none; cursor: pointer; margin-top: 1rem; transition: all 0.2s;
         }
-        .update-button:hover { background-color: #d97706; /* amber-600 */ }
-
+        .update-button:hover { background-color: #d97706; }
 
         /* --- Form --- */
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
@@ -78,20 +69,26 @@
             width: 100%; padding: 0.75rem 1rem; background-color: #f8fafc; border: 1px solid #cbd5e1;
             border-radius: 0.5rem; transition: all 0.3s;
         }
-        .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; }
+        .form-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--primary-focus-ring); }
         
         .submit-button {
-            width: 100%; background-color: #2563eb; color: white; font-weight: 600; padding: 0.875rem 1.5rem;
+            width: 100%; background-color: var(--primary-color); color: white; font-weight: 600; padding: 0.875rem 1.5rem;
             border-radius: 0.5rem; border: none; cursor: pointer; transition: all 0.3s;
         }
-        .submit-button:hover { background-color: #1d4ed8; transform: scale(1.02); }
-        .submit-button:focus { outline: none; box-shadow: 0 0 0 4px #93c5fd; }
+        .submit-button:hover { background-color: var(--primary-hover); transform: scale(1.02); }
+        .submit-button:focus { outline: none; box-shadow: 0 0 0 4px var(--primary-focus-ring); }
         
+        .secondary-button {
+             width: 100%; background-color: #64748b; color: white; font-weight: 600; padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; border: none; cursor: pointer; transition: all 0.3s;
+        }
+        .secondary-button:hover { background-color: #475569; }
+
         /* --- Custom Radio Buttons --- */
         .radio-group { display: flex; gap: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.25rem; background-color: #f8fafc; }
         .radio-group label { flex: 1; text-align: center; padding: 0.5rem; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; font-size: 0.875rem; font-weight: 500; }
         .radio-group input[type="radio"] { display: none; }
-        .radio-group input[type="radio"]:checked + label { background-color: #2563eb; color: white; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); }
+        .radio-group input[type="radio"]:checked + label { background-color: var(--primary-color); color: white; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); }
 
         /* --- Results Section --- */
         .results-container { padding: 1.5rem; border-top: 1px solid #e2e8f0; }
@@ -105,22 +102,34 @@
 
         /* --- VISUAL TIMELINE --- */
         .timeline-container { display: flex; width: 100%; height: 70px; background-color: #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); }
-        .timeline-segment { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; padding: 0.25rem; box-sizing: border-box; }
+        .timeline-segment { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; padding: 0.25rem; box-sizing: border-box; animation: fadeIn 0.5s ease-in-out; }
         .timeline-segment .time { font-weight: 600; font-size: 0.8rem; }
         .timeline-segment .duration { font-size: 0.7rem; opacity: 0.8; }
-        .timeline-break { background-color: #3b82f6; }
+        .timeline-break { background-color: var(--primary-color); }
         .timeline-buffer { background-color: #64748b; }
 
         #results-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; }
-        .result-item { background-color: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
-        .result-item-number { background-color: #dbeafe; color: #1e40af; font-size: 0.875rem; font-weight: 600; margin-right: 0.75rem; width: 1.75rem; height: 1.75rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; }
+        .result-item { background-color: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; animation: slideInUp 0.5s ease-out; }
+        .result-item-number { background-color: var(--primary-light-bg); color: var(--primary-color); font-size: 0.875rem; font-weight: 600; margin-right: 0.75rem; width: 1.75rem; height: 1.75rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; }
         .result-item-time { font-weight: 600; }
         .result-item-duration { font-size: 0.875rem; font-weight: 500; color: #16a34a; }
         
         #second-service-time { text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; }
+        #service-start-time-value { color: var(--primary-color); }
+
+        /* --- SLIDER --- */
+        #slider-container { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; animation: fadeIn 0.5s ease-in-out; }
+        input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #e5e7eb; border-radius: 5px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: var(--primary-color); border-radius: 50%; cursor: pointer; }
+        input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; background: var(--primary-color); border-radius: 50%; cursor: pointer; border: none; }
         
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
         /* --- Utilities --- */
         .hidden { display: none; }
+        .animated-item { animation: fadeIn 0.5s ease-in-out; }
     </style>
 </head>
 <body>
@@ -166,7 +175,10 @@
                         <label for="buffer" class="form-label">Change-over per Break (mins)</label>
                         <input type="number" id="buffer" min="0" value="10" class="form-input">
                     </div>
-                    <div class="form-group col-span-2">
+                    <div class="form-group">
+                        <button type="button" id="force3HourBtn" class="secondary-button">Make Long Break 3 Hours</button>
+                    </div>
+                    <div class="form-group">
                         <button type="button" id="calculateBtn" class="submit-button">Calculate Schedule</button>
                     </div>
                 </div>
@@ -175,19 +187,31 @@
             <div id="results-container" class="results-container hidden">
                  <h2>Schedule Overview</h2>
                  <div id="errorMessage" class="hidden"></div>
-                 <div id="summary"></div>
-                 <div id="timeline-container" class="timeline-container"></div>
+                 <div id="summary" class="animated-item"></div>
+                 <div id="timeline-container" class="timeline-container animated-item" style="animation-delay: 0.1s;"></div>
                  <ul id="results-list" class="results-list"></ul>
-                 <div id="second-service-time" class="hidden">
+
+                 <div id="slider-container" class="hidden">
+                    <label for="break-slider" class="form-label text-center">Adjust Break Times</label>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm font-medium text-slate-500">More for S</span>
+                        <input type="range" id="break-slider" value="0" min="0" max="100">
+                        <span class="text-sm font-medium text-slate-500">More for L</span>
+                    </div>
+                 </div>
+
+                 <div id="second-service-time" class="hidden animated-item" style="animation-delay: 0.3s;">
                     <p class="text-slate-600 font-medium">Second Service Starts At:</p>
-                    <p id="service-start-time-value" class="text-2xl font-bold text-blue-600 mt-1"></p>
+                    <p id="service-start-time-value" class="text-2xl font-bold mt-1"></p>
                  </div>
             </div>
         </div>
     </div>
     
     <script>
+        // --- DOM ELEMENTS ---
         const calculateBtn = document.getElementById('calculateBtn');
+        const force3HourBtn = document.getElementById('force3HourBtn');
         const resultsContainer = document.getElementById('results-container');
         const resultsList = document.getElementById('results-list');
         const errorMessage = document.getElementById('errorMessage');
@@ -196,162 +220,215 @@
         const startTimeInput = document.getElementById('startTime');
         const endTimeInput = document.getElementById('endTime');
         const secondServiceTimeDiv = document.getElementById('second-service-time');
-        
         const numBreaksGroup = document.getElementById('numBreaksGroup');
         const fourBreakOptions = document.getElementById('four-break-options');
+        const sliderContainer = document.getElementById('slider-container');
+        const breakSlider = document.getElementById('break-slider');
         
+        // --- GLOBAL STATE for slider ---
+        let initialFourBreakDurations = null;
+        let sliderStartMinutes = 0;
+        let sliderEndMinutes = 0;
+        let sliderBuffer = 0;
+
+        // --- EVENT LISTENERS ---
         numBreaksGroup.addEventListener('change', (e) => {
             fourBreakOptions.classList.toggle('hidden', e.target.value !== '4');
         });
         
         startTimeInput.addEventListener('input', () => {
-            if (startTimeInput.value.length === 4) {
-                endTimeInput.focus();
-            }
+            if (startTimeInput.value.length === 4) endTimeInput.focus();
         });
-        
-        calculateBtn.addEventListener('click', function() {
-            resultsList.innerHTML = '';
-            summaryDiv.innerHTML = '';
-            timelineContainer.innerHTML = '';
+
+        calculateBtn.addEventListener('click', () => calculateAndDisplay({ force3Hour: false }));
+        force3HourBtn.addEventListener('click', () => calculateAndDisplay({ force3Hour: true }));
+
+        breakSlider.addEventListener('input', () => {
+            if (!initialFourBreakDurations) return; // Guard clause
+            
+            const transferAmount = parseInt(breakSlider.value, 10);
+            const [s1, s2, l1, l2] = initialFourBreakDurations;
+            
+            const new_s1 = s1 + Math.floor(transferAmount / 2);
+            const new_s2 = s2 + (transferAmount - Math.floor(transferAmount / 2));
+            const new_l1 = l1 - Math.floor(transferAmount / 2);
+            const new_l2 = l2 - (transferAmount - Math.floor(transferAmount / 2));
+
+            const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
+            const finalDurations = (pattern === 'SSLL') ? [new_s1, new_s2, new_l1, new_l2] : [new_s1, new_l1, new_l2, new_s2];
+
+            displayResults(finalDurations, sliderStartMinutes, sliderEndMinutes, sliderBuffer, false); // No animation on slider change
+        });
+
+        // --- CALCULATION LOGIC ---
+        function calculateAndDisplay(options = {}) {
+            const { force3Hour = false } = options;
+            sliderContainer.classList.add('hidden');
+            
             errorMessage.classList.add('hidden');
             resultsContainer.classList.add('hidden');
-            secondServiceTimeDiv.classList.add('hidden');
 
-            const startTimeString = document.getElementById('startTime').value;
-            const endTimeString = document.getElementById('endTime').value;
             const numBreaks = parseInt(document.querySelector('input[name="numBreaks"]:checked').value, 10);
             const buffer = parseInt(document.getElementById('buffer').value, 10);
-
-            const parsedStartTime = parseHHMM(startTimeString);
-            const parsedEndTime = parseHHMM(endTimeString);
+            const parsedStartTime = parseHHMM(startTimeInput.value);
+            const parsedEndTime = parseHHMM(endTimeInput.value);
 
             if (!parsedStartTime || !parsedEndTime || isNaN(numBreaks) || isNaN(buffer)) {
                 showError("Please fill in all fields correctly.");
                 return;
             }
             
-            resultsContainer.classList.remove('hidden');
-
             const totalStartMinutes = parsedStartTime.hours * 60 + parsedStartTime.minutes;
             let totalEndMinutes = parsedEndTime.hours * 60 + parsedEndTime.minutes;
             if (totalEndMinutes <= totalStartMinutes) totalEndMinutes += 24 * 60;
 
             const totalAvailableTime = totalEndMinutes - totalStartMinutes;
             const totalBufferTime = numBreaks * buffer;
-            
+
             if (totalAvailableTime < totalBufferTime) {
-                showError("Total window is not long enough for the required change-overs.");
+                showError("Total window is not long enough for change-overs.");
+                return;
+            }
+
+            const netBreakTime = totalAvailableTime - totalBufferTime;
+            if (netBreakTime <= 0) {
+                 showError("No time for breaks after change-overs.");
                 return;
             }
             
-            const netBreakTime = totalAvailableTime - totalBufferTime;
-             if (netBreakTime <= 0) {
-                showError("No time remaining for breaks after change-overs.");
+            const durations = calculateDurations(netBreakTime, numBreaks, force3Hour);
+
+            if (!durations) {
+                showError("Not enough time to make long breaks 3 hours.");
                 return;
             }
 
-            let durations = [];
-            let summaryText = '';
-
+            resultsContainer.classList.remove('hidden');
+            displayResults(durations, totalStartMinutes, totalEndMinutes, buffer, true); // Animate on initial calculation
+            
+            if (numBreaks === 4) {
+                const sortedBreaks = [...durations].sort((a,b) => a-b);
+                initialFourBreakDurations = [sortedBreaks[0], sortedBreaks[1], sortedBreaks[2], sortedBreaks[3]];
+                
+                const maxTransfer = Math.floor(((sortedBreaks[2] + sortedBreaks[3]) - (sortedBreaks[0] + sortedBreaks[1])) / 2);
+                
+                breakSlider.max = maxTransfer > 0 ? maxTransfer : 0;
+                breakSlider.value = 0;
+                
+                sliderStartMinutes = totalStartMinutes;
+                sliderEndMinutes = totalEndMinutes;
+                sliderBuffer = buffer;
+                
+                sliderContainer.classList.remove('hidden');
+            }
+        }
+        
+        function calculateDurations(netBreakTime, numBreaks, force3Hour) {
             if (numBreaks === 2) {
                 const breakDuration = Math.floor(netBreakTime / 2);
-                const remainder = netBreakTime % 2;
-                durations.push(breakDuration + remainder, breakDuration);
-                summaryText = `Breaks of ${formatDuration(breakDuration + remainder)} & ${formatDuration(breakDuration)}`;
-            } else { // numBreaks === 4
-                const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
-                let idealShort = Math.floor(netBreakTime / 6);
-                let idealLong = 2 * idealShort;
-                let breaks = [idealShort, idealShort, idealLong, idealLong];
-                let remainder = netBreakTime - breaks.reduce((a, b) => a + b, 0);
-                for (let i = 0; i < remainder; i++) breaks[3 - (i % 4)]++;
-
-                let excess = 0;
-                breaks.forEach((br, i) => { if (br > 180) { excess += br - 180; breaks[i] = 180; } });
-                if (excess > 0) {
-                    breaks.sort((a, b) => a - b);
-                    breaks[0] += Math.floor(excess / 2);
-                    breaks[1] += excess - Math.ceil(excess / 2);
+                return [breakDuration + (netBreakTime % 2), breakDuration];
+            } 
+            
+            if (force3Hour) {
+                if (netBreakTime < 360) return null;
+                let l1 = 180, l2 = 180;
+                let remaining = netBreakTime - 360;
+                let s1 = Math.floor(remaining / 2);
+                let s2 = remaining - s1;
+                if (s1 >= 180) {
+                    const excess = (s1 - 180) + (s2 - 180);
+                    s1 = 180; s2 = 180;
+                    l1 += Math.floor(excess / 2);
+                    l2 += excess - Math.floor(excess / 2);
                 }
+                const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
+                return (pattern === 'SSLL') ? [s1, s2, l1, l2] : [s1, l1, l2, s2];
+            } 
+            
+            let idealShort = Math.floor(netBreakTime / 6);
+            let breaks = [idealShort, idealShort, 2 * idealShort, 2 * idealShort];
+            let remainder = netBreakTime - breaks.reduce((a, b) => a + b, 0);
+            for (let i = 0; i < remainder; i++) breaks[3 - (i % 4)]++;
 
+            let excess = 0;
+            breaks.forEach((br, i) => { if (br > 180) { excess += br - 180; breaks[i] = 180; } });
+            if (excess > 0) {
                 breaks.sort((a, b) => a - b);
-                let [s1, s2, l1, l2] = breaks;
-                
-                if (pattern === 'SSLL') durations = [s1, s2, l1, l2];
-                else durations = [s1, l1, l2, s2];
-                
-                let shortSummary = s1 === s2 ? formatDuration(s1) : `${formatDuration(s1)} & ${formatDuration(s2)}`;
-                let longSummary = l1 === l2 ? formatDuration(l1) : `${formatDuration(l1)} & ${formatDuration(l2)}`;
-                summaryText = `S: ${shortSummary}, L: ${longSummary}`;
+                breaks[0] += Math.floor(excess / 2);
+                breaks[1] += excess - Math.ceil(excess / 2);
             }
+            breaks.sort((a, b) => a - b);
+            
+            const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
+            return (pattern === 'SSLL') ? [breaks[0], breaks[1], breaks[2], breaks[3]] : [breaks[0], breaks[2], breaks[3], breaks[1]];
+        }
 
-            summaryDiv.innerHTML = `
+        function displayResults(durations, startMinutes, endMinutes, buffer, animate = false) {
+            resultsList.innerHTML = '';
+            timelineContainer.innerHTML = '';
+
+            const numBreaks = durations.length;
+            const totalBufferTime = numBreaks * buffer;
+            const totalAvailableTime = endMinutes - startMinutes;
+            const netBreakTime = totalAvailableTime - totalBufferTime;
+
+            let summaryHtml = `
                 <p>Total Window<span class="font-semibold">${formatDuration(totalAvailableTime)}</span></p>
                 <p>Total Breaks<span class="font-semibold">${formatDuration(netBreakTime)}</span></p>
                 <p>Total Change-over<span class="font-semibold">${formatDuration(totalBufferTime)}</span></p>
             `;
+            if (numBreaks === 4) {
+                const sortedBreaks = [...durations].sort((a,b)=>a-b);
+                const s1 = sortedBreaks[0], s2 = sortedBreaks[1];
+                const l1 = sortedBreaks[2], l2 = sortedBreaks[3];
+                let shortSummary = s1 === s2 ? formatDuration(s1) : `${formatDuration(s1)} & ${formatDuration(s2)}`;
+                let longSummary = l1 === l2 ? formatDuration(l1) : `${formatDuration(l1)} & ${formatDuration(l2)}`;
+                summaryHtml += `<p style="flex-basis: 100%; margin-top: 0.5rem;">S: ${shortSummary} | L: ${longSummary}</p>`;
+            }
+            summaryDiv.innerHTML = summaryHtml;
 
-            let currentBreakStartTime = totalStartMinutes;
-            for (let i = 0; i < numBreaks; i++) {
-                const currentBreakDuration = durations[i];
-                if (currentBreakDuration <= 0) continue;
-
+            let currentBreakStartTime = startMinutes;
+            durations.forEach((duration, i) => {
+                if (duration <= 0) return;
                 const breakStart = currentBreakStartTime;
-                const breakEnd = breakStart + currentBreakDuration;
+                const breakEnd = breakStart + duration;
 
-                // Add to visual timeline
-                addTimelineSegment(breakStart, breakEnd, 'break', `Break ${i+1}`);
-                addTimelineSegment(breakEnd, breakEnd + buffer, 'buffer', `Buffer`);
+                addTimelineSegment(breakStart, breakEnd, 'break', `Break ${i+1}`, totalAvailableTime, animate);
+                addTimelineSegment(breakEnd, breakEnd + buffer, 'buffer', `Buffer`, totalAvailableTime, animate);
 
-                // Add to list
                 const listItem = document.createElement('li');
                 listItem.className = 'result-item';
+                if (animate) listItem.style.animationDelay = `${0.2 + i * 0.1}s`;
                 listItem.innerHTML = `
                     <div style="display: flex; align-items: center;">
                         <span class="result-item-number">${i + 1}</span>
                         <p class="result-item-time">${formatTime(breakStart)} - ${formatTime(breakEnd)}</p>
                     </div>
-                    <div class="result-item-duration">${formatDuration(currentBreakDuration)}</div>
+                    <div class="result-item-duration">${formatDuration(duration)}</div>
                 `;
                 resultsList.appendChild(listItem);
-
                 currentBreakStartTime = breakEnd + buffer;
-            }
+            });
 
-            // Display second service start time
             const serviceStartTimeValueEl = document.getElementById('service-start-time-value');
             serviceStartTimeValueEl.textContent = formatTime(currentBreakStartTime);
             secondServiceTimeDiv.classList.remove('hidden');
+        }
 
-        });
-
-        function addTimelineSegment(start, end, type, label) {
-            const parsedStartTime = parseHHMM(document.getElementById('startTime').value);
-            const parsedEndTime = parseHHMM(document.getElementById('endTime').value);
-            if (!parsedStartTime || !parsedEndTime) return;
-            
-            let totalStartMinutes = parsedStartTime.hours * 60 + parsedStartTime.minutes;
-            let totalEndMinutes = parsedEndTime.hours * 60 + parsedEndTime.minutes;
-            if (totalEndMinutes <= totalStartMinutes) totalEndMinutes += 24 * 60;
-            
-            const totalWindow = totalEndMinutes - totalStartMinutes;
-            if (totalWindow <= 0) return;
-            
+        function addTimelineSegment(start, end, type, label, totalWindow, animate) {
             const duration = end - start;
-            if (duration <= 0) return;
+            if (duration <= 0 || totalWindow <= 0) return;
 
             const segment = document.createElement('div');
             segment.className = `timeline-segment timeline-${type}`;
+            if (animate) segment.style.animationDelay = '0.1s';
             segment.style.width = `${(duration / totalWindow) * 100}%`;
             
-            const showText = (duration / totalWindow) > 0.10; // Only show text if segment is wide enough
+            const showText = (duration / totalWindow) > 0.10;
             segment.innerHTML = showText ? `
                 <span class="time">${formatTime(start)}-${formatTime(end)}</span>
-                <span class="duration">${formatDuration(duration)}</span>
-            ` : '';
+                <span class="duration">${formatDuration(duration)}</span>` : '';
             segment.title = `${label}: ${formatTime(start)} - ${formatTime(end)} (${formatDuration(duration)})`;
-
             timelineContainer.appendChild(segment);
         }
 
@@ -362,6 +439,7 @@
             summaryDiv.innerHTML = '';
             timelineContainer.innerHTML = '';
             secondServiceTimeDiv.classList.add('hidden');
+            sliderContainer.classList.add('hidden');
         }
 
         function parseHHMM(timeString) {
