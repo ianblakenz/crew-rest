@@ -39,6 +39,7 @@
 
         /* --- Header --- */
         .header { text-align: center; margin-bottom: 2rem; }
+        .header .logo { display: block; margin-left: auto; margin-right: auto; height: 48px; margin-bottom: 1rem; }
         .header h1 { font-size: 1.875rem; font-weight: 700; color: #1e293b; margin: 0; }
 
         /* --- Form --- */
@@ -91,6 +92,8 @@
         .result-item-time { font-weight: 600; }
         .result-item-duration { font-size: 0.875rem; font-weight: 500; color: #16a34a; }
         
+        #second-service-time { text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; }
+        
         /* --- Utilities --- */
         .hidden { display: none; }
     </style>
@@ -101,16 +104,17 @@
         <div class="card">
             <div class="card-content">
                 <div class="header">
+                    <img src="https://media.faaa.com.au/logo/faaa_logo.png" alt="FAAA Logo" class="logo">
                     <h1>Inflight Rest Calculator</h1>
                 </div>
 
                 <div id="restForm" class="form-grid">
                     <div class="form-group">
-                        <label for="startTime" class="form-label">Break Window Start (HHMM)</label>
+                        <label for="startTime" class="form-label">Breaks start at:</label>
                         <input type="text" id="startTime" class="form-input" inputmode="numeric" pattern="\d{3,4}" placeholder="e.g., 2230" maxlength="4">
                     </div>
                     <div class="form-group">
-                        <label for="endTime" class="form-label">Break Window End (HHMM)</label>
+                        <label for="endTime" class="form-label">Breaks end at:</label>
                         <input type="text" id="endTime" class="form-input" inputmode="numeric" pattern="\d{3,4}" placeholder="e.g., 0400" maxlength="4">
                     </div>
                     <div class="form-group col-span-2">
@@ -147,6 +151,10 @@
                  <div id="summary"></div>
                  <div id="timeline-container" class="timeline-container"></div>
                  <ul id="results-list" class="results-list"></ul>
+                 <div id="second-service-time" class="hidden">
+                    <p class="text-slate-600 font-medium">Second Service Starts At:</p>
+                    <p id="service-start-time-value" class="text-2xl font-bold text-blue-600 mt-1"></p>
+                 </div>
             </div>
         </div>
     </div>
@@ -160,6 +168,7 @@
         const timelineContainer = document.getElementById('timeline-container');
         const startTimeInput = document.getElementById('startTime');
         const endTimeInput = document.getElementById('endTime');
+        const secondServiceTimeDiv = document.getElementById('second-service-time');
         
         const numBreaksGroup = document.getElementById('numBreaksGroup');
         const fourBreakOptions = document.getElementById('four-break-options');
@@ -180,6 +189,7 @@
             timelineContainer.innerHTML = '';
             errorMessage.classList.add('hidden');
             resultsContainer.classList.add('hidden');
+            secondServiceTimeDiv.classList.add('hidden');
 
             const startTimeString = document.getElementById('startTime').value;
             const endTimeString = document.getElementById('endTime').value;
@@ -201,7 +211,6 @@
             if (totalEndMinutes <= totalStartMinutes) totalEndMinutes += 24 * 60;
 
             const totalAvailableTime = totalEndMinutes - totalStartMinutes;
-            // --- LOGIC CHANGE: Buffer is now applied for every break ---
             const totalBufferTime = numBreaks * buffer;
             
             if (totalAvailableTime < totalBufferTime) {
@@ -282,6 +291,12 @@
 
                 currentBreakStartTime = breakEnd + buffer;
             }
+
+            // Display second service start time
+            const serviceStartTimeValueEl = document.getElementById('service-start-time-value');
+            serviceStartTimeValueEl.textContent = formatTime(currentBreakStartTime);
+            secondServiceTimeDiv.classList.remove('hidden');
+
         });
 
         function addTimelineSegment(start, end, type, label) {
@@ -319,6 +334,7 @@
             resultsContainer.classList.remove('hidden');
             summaryDiv.innerHTML = '';
             timelineContainer.innerHTML = '';
+            secondServiceTimeDiv.classList.add('hidden');
         }
 
         function parseHHMM(timeString) {
@@ -356,3 +372,4 @@
 
 </body>
 </html>
+
