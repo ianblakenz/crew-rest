@@ -1,7 +1,9 @@
 const CACHE_NAME = 'inflight-rest-cache-v1';
+// Use relative paths for assets so they work in a subdirectory
+// like on GitHub Pages.
 const urlsToCache = [
-  '/',
-  '/index.html'
+  './',
+  './index.html'
 ];
 
 // Install the service worker and cache the static assets
@@ -30,3 +32,4 @@ self.addEventListener('fetch', event => {
     )
   );
 });
+
