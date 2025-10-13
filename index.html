@@ -227,8 +227,8 @@
                     <div class="form-group hidden" id="force-3-hour-container">
                         <button type="button" id="force3HourBtn" class="secondary-button">Make Long Break 3 Hours</button>
                     </div>
-                    <div class="form-group">
-                        <button type="button" id="calculateBtn" class="submit-button">Calculate Breaks</button>
+                    <div class="form-group col-span-2">
+                        <button type="button" id="calculateBtn" class="submit-button">Calculate Schedule</button>
                     </div>
                 </div>
             </div>
@@ -241,7 +241,7 @@
                  <ul id="results-list" class="results-list"></ul>
 
                  <div id="adjustment-container" class="hidden">
-                    <label class="form-label text-center">Adjust Break Times (L ↔ S)</label>
+                    <label class="form-label text-center">Adjust breaks</label>
                     <div class="flex items-center justify-center gap-6">
                         <button id="minus-btn" class="adjust-btn">-5</button>
                         <span id="adjustment-display" class="text-lg font-bold">0m</span>
@@ -249,14 +249,14 @@
                     </div>
                  </div>
 
-                 <div id="second-service-time" class="hidden animated-item" style="animation-delay: 0.3s;">
+                 <div id="second-service-time" class="hidden animated-item result-item mt-6" style="animation-delay: 0.3s; justify-content: center; flex-direction: column; padding: 1.5rem;">
                     <p class="text-slate-600 font-medium">Second Service Starts At:</p>
                     <p id="service-start-time-value" class="text-2xl font-bold mt-1"></p>
                  </div>
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <p>Version 1.0.1</p>
+             <p>Version 1.0.2</p>
         </footer>
     </div>
     
@@ -293,8 +293,9 @@
         let sliderStartMinutes = 0;
         let sliderEndMinutes = 0;
         let sliderBuffer = 0;
-        let adjustmentAmount = 0;
-        let maxAdjustment = 0;
+        let adjustmentOffset = 0; // Can be positive or negative
+        let minOffset = 0;
+        let maxOffset = 0;
 
         // --- EVENT LISTENERS ---
         numBreaksGroup.addEventListener('change', (e) => {
@@ -311,15 +312,15 @@
         force3HourBtn.addEventListener('click', () => calculateAndDisplay({ force3Hour: true }));
 
         plusBtn.addEventListener('click', () => {
-            if (adjustmentAmount + 5 <= maxAdjustment) {
-                adjustmentAmount += 5;
+            if (adjustmentOffset + 5 <= maxOffset) {
+                adjustmentOffset += 5;
                 updateAdjustedBreaks();
             }
         });
 
         minusBtn.addEventListener('click', () => {
-            if (adjustmentAmount - 5 >= 0) {
-                adjustmentAmount -= 5;
+            if (adjustmentOffset - 5 >= minOffset) {
+                adjustmentOffset -= 5;
                 updateAdjustedBreaks();
             }
         });
@@ -328,21 +329,24 @@
             if (!initialFourBreakDurations) return;
             
             const [s1, s2, l1, l2] = initialFourBreakDurations;
-            const transfer = adjustmentAmount;
+            const transfer = adjustmentOffset;
 
-            const new_s1 = s1 + Math.floor(transfer / 2);
-            const new_s2 = s2 + (transfer - Math.floor(transfer / 2));
-            const new_l1 = l1 - Math.floor(transfer / 2);
-            const new_l2 = l2 - (transfer - Math.floor(transfer / 2));
+            // Positive transfer moves from short to long, negative from long to short
+            const new_s1 = s1 - Math.floor(transfer / 2);
+            const new_s2 = s2 - (transfer - Math.floor(transfer / 2));
+            const new_l1 = l1 + Math.floor(transfer / 2);
+            const new_l2 = l2 + (transfer - Math.floor(transfer / 2));
 
             const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
             const finalDurations = (pattern === 'SSLL') ? [new_s1, new_s2, new_l1, new_l2] : [new_s1, new_l1, new_l2, new_s2];
 
             displayResults(finalDurations, sliderStartMinutes, sliderEndMinutes, sliderBuffer, false);
-            adjustmentDisplay.textContent = `${adjustmentAmount}m`;
             
-            minusBtn.disabled = adjustmentAmount === 0;
-            plusBtn.disabled = adjustmentAmount === maxAdjustment;
+            const displaySign = adjustmentOffset > 0 ? '+' : '';
+            adjustmentDisplay.textContent = `${displaySign}${adjustmentOffset}m`;
+            
+            minusBtn.disabled = adjustmentOffset <= minOffset;
+            plusBtn.disabled = adjustmentOffset >= maxOffset;
         }
 
         // --- CALCULATION LOGIC ---
@@ -395,18 +399,23 @@
                 const sortedBreaks = [...durations].sort((a,b) => a-b);
                 initialFourBreakDurations = [sortedBreaks[0], sortedBreaks[1], sortedBreaks[2], sortedBreaks[3]];
                 
-                maxAdjustment = Math.floor(((sortedBreaks[2] + sortedBreaks[3]) - (sortedBreaks[0] + sortedBreaks[1])) / 2);
-                maxAdjustment = Math.floor(maxAdjustment / 5) * 5; // Ensure it's a multiple of 5
+                // Max offset: How much can be taken from shorts (cannot be < 0)
+                maxOffset = Math.floor(sortedBreaks[0] + sortedBreaks[1]);
+                maxOffset = Math.floor(maxOffset / 5) * 5;
 
-                adjustmentAmount = 0;
+                // Min offset: How much can be taken from longs (cannot be less than shorts)
+                minOffset = -Math.floor(((sortedBreaks[2] + sortedBreaks[3]) - (sortedBreaks[0] + sortedBreaks[1])) / 2);
+                minOffset = Math.ceil(minOffset / 5) * 5;
+
+                adjustmentOffset = 0;
                 adjustmentDisplay.textContent = '0m';
                 
                 sliderStartMinutes = totalStartMinutes;
                 sliderEndMinutes = totalEndMinutes;
                 sliderBuffer = buffer;
                 
-                minusBtn.disabled = true;
-                plusBtn.disabled = maxAdjustment <= 0;
+                minusBtn.disabled = adjustmentOffset <= minOffset;
+                plusBtn.disabled = adjustmentOffset >= maxOffset;
                 
                 adjustmentContainer.classList.remove('hidden');
             }
@@ -459,7 +468,7 @@
             const numBreaks = durations.length;
             const totalBufferTime = numBreaks * buffer;
             const totalAvailableTime = endMinutes - startMinutes;
-            const netBreakTime = totalAvailableTime - totalBufferTime;
+            const netBreakTime = durations.reduce((a,b) => a+b, 0); // Recalculate based on adjusted durations
 
             let summaryHtml = `
                 <p>Total Window<span class="font-semibold">${formatDuration(totalAvailableTime)}</span></p>
