@@ -1,9 +1,9 @@
-const CACHE_NAME = 'inflight-rest-cache-v1';
-// Use relative paths for assets so they work in a subdirectory
-// like on GitHub Pages.
+const CACHE_NAME = 'inflight-rest-cache-v5'; // Version bumped to v5
 const urlsToCache = [
   './',
-  './index.html'
+  './index.html',
+  './manifest.json',
+  'https://media.faaa.com.au/logo/faaa_logo.png'
 ];
 
 // Install the service worker and cache the static assets
@@ -17,6 +17,24 @@ self.addEventListener('install', event => {
   );
 });
 
+// This new 'activate' event is crucial for deleting old caches
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            // If this cache name is not in our whitelist, delete it.
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
 // Serve cached content when offline
 self.addEventListener('fetch', event => {
   event.respondWith(
@@ -26,10 +44,16 @@ self.addEventListener('fetch', event => {
         if (response) {
           return response;
         }
-        // Not in cache - fetch from network
         return fetch(event.request);
       }
     )
   );
+});
+
+// This listener waits for the "skipWaiting" message from the UI
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
 
