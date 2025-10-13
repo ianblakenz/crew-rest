@@ -117,11 +117,22 @@
         #second-service-time { text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; }
         #service-start-time-value { color: var(--primary-color); }
 
-        /* --- SLIDER --- */
-        #slider-container { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; animation: fadeIn 0.5s ease-in-out; }
-        input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #e5e7eb; border-radius: 5px; outline: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: var(--primary-color); border-radius: 50%; cursor: pointer; }
-        input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; background: var(--primary-color); border-radius: 50%; cursor: pointer; border: none; }
+        /* --- ADJUSTMENT CONTROLS --- */
+        #adjustment-container { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; animation: fadeIn 0.5s ease-in-out; }
+        .adjust-btn {
+            width: 44px; height: 44px;
+            background-color: var(--primary-light-bg);
+            color: var(--primary-color);
+            font-weight: 600; font-size: 1.25rem;
+            border-radius: 9999px; border: 1px solid var(--primary-color);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .adjust-btn:hover { background-color: var(--primary-color); color: white; }
+        .adjust-btn:disabled {
+            opacity: 0.4; cursor: not-allowed;
+            background-color: #e5e7eb; color: #9ca3af; border-color: #d1d5db;
+        }
+        #adjustment-display { font-size: 1.125rem; font-weight: 600; color: #334155; min-width: 60px; text-align: center; }
         
         /* --- ANIMATIONS --- */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -175,7 +186,7 @@
                         <label for="buffer" class="form-label">Change-over per Break (mins)</label>
                         <input type="number" id="buffer" min="0" value="10" class="form-input">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group hidden" id="force-3-hour-container">
                         <button type="button" id="force3HourBtn" class="secondary-button">Make Long Break 3 Hours</button>
                     </div>
                     <div class="form-group">
@@ -191,12 +202,12 @@
                  <div id="timeline-container" class="timeline-container animated-item" style="animation-delay: 0.1s;"></div>
                  <ul id="results-list" class="results-list"></ul>
 
-                 <div id="slider-container" class="hidden">
-                    <label for="break-slider" class="form-label text-center">Adjust Break Times</label>
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-medium text-slate-500">More for S</span>
-                        <input type="range" id="break-slider" value="0" min="0" max="100">
-                        <span class="text-sm font-medium text-slate-500">More for L</span>
+                 <div id="adjustment-container" class="hidden">
+                    <label class="form-label text-center">Adjust Break Times (L ↔ S)</label>
+                    <div class="flex items-center justify-center gap-6">
+                        <button id="minus-btn" class="adjust-btn">-5</button>
+                        <span id="adjustment-display" class="text-lg font-bold">0m</span>
+                        <button id="plus-btn" class="adjust-btn">+5</button>
                     </div>
                  </div>
 
@@ -206,6 +217,9 @@
                  </div>
             </div>
         </div>
+        <footer class="text-center mt-4 text-xs text-slate-400">
+             <p>Version 1.0.0</p>
+        </footer>
     </div>
     
     <script>
@@ -222,18 +236,24 @@
         const secondServiceTimeDiv = document.getElementById('second-service-time');
         const numBreaksGroup = document.getElementById('numBreaksGroup');
         const fourBreakOptions = document.getElementById('four-break-options');
-        const sliderContainer = document.getElementById('slider-container');
-        const breakSlider = document.getElementById('break-slider');
+        const adjustmentContainer = document.getElementById('adjustment-container');
+        const plusBtn = document.getElementById('plus-btn');
+        const minusBtn = document.getElementById('minus-btn');
+        const adjustmentDisplay = document.getElementById('adjustment-display');
         
-        // --- GLOBAL STATE for slider ---
+        // --- GLOBAL STATE for adjustment ---
         let initialFourBreakDurations = null;
         let sliderStartMinutes = 0;
         let sliderEndMinutes = 0;
         let sliderBuffer = 0;
+        let adjustmentAmount = 0;
+        let maxAdjustment = 0;
 
         // --- EVENT LISTENERS ---
         numBreaksGroup.addEventListener('change', (e) => {
-            fourBreakOptions.classList.toggle('hidden', e.target.value !== '4');
+            const isFourBreaks = e.target.value === '4';
+            fourBreakOptions.classList.toggle('hidden', !isFourBreaks);
+            force3HourBtn.parentElement.classList.toggle('hidden', !isFourBreaks);
         });
         
         startTimeInput.addEventListener('input', () => {
@@ -243,27 +263,45 @@
         calculateBtn.addEventListener('click', () => calculateAndDisplay({ force3Hour: false }));
         force3HourBtn.addEventListener('click', () => calculateAndDisplay({ force3Hour: true }));
 
-        breakSlider.addEventListener('input', () => {
-            if (!initialFourBreakDurations) return; // Guard clause
+        plusBtn.addEventListener('click', () => {
+            if (adjustmentAmount + 5 <= maxAdjustment) {
+                adjustmentAmount += 5;
+                updateAdjustedBreaks();
+            }
+        });
+
+        minusBtn.addEventListener('click', () => {
+            if (adjustmentAmount - 5 >= 0) {
+                adjustmentAmount -= 5;
+                updateAdjustedBreaks();
+            }
+        });
+
+        function updateAdjustedBreaks() {
+            if (!initialFourBreakDurations) return;
             
-            const transferAmount = parseInt(breakSlider.value, 10);
             const [s1, s2, l1, l2] = initialFourBreakDurations;
-            
-            const new_s1 = s1 + Math.floor(transferAmount / 2);
-            const new_s2 = s2 + (transferAmount - Math.floor(transferAmount / 2));
-            const new_l1 = l1 - Math.floor(transferAmount / 2);
-            const new_l2 = l2 - (transferAmount - Math.floor(transferAmount / 2));
+            const transfer = adjustmentAmount;
+
+            const new_s1 = s1 + Math.floor(transfer / 2);
+            const new_s2 = s2 + (transfer - Math.floor(transfer / 2));
+            const new_l1 = l1 - Math.floor(transfer / 2);
+            const new_l2 = l2 - (transfer - Math.floor(transfer / 2));
 
             const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
             const finalDurations = (pattern === 'SSLL') ? [new_s1, new_s2, new_l1, new_l2] : [new_s1, new_l1, new_l2, new_s2];
 
-            displayResults(finalDurations, sliderStartMinutes, sliderEndMinutes, sliderBuffer, false); // No animation on slider change
-        });
+            displayResults(finalDurations, sliderStartMinutes, sliderEndMinutes, sliderBuffer, false);
+            adjustmentDisplay.textContent = `${adjustmentAmount}m`;
+            
+            minusBtn.disabled = adjustmentAmount === 0;
+            plusBtn.disabled = adjustmentAmount === maxAdjustment;
+        }
 
         // --- CALCULATION LOGIC ---
         function calculateAndDisplay(options = {}) {
             const { force3Hour = false } = options;
-            sliderContainer.classList.add('hidden');
+            adjustmentContainer.classList.add('hidden');
             
             errorMessage.classList.add('hidden');
             resultsContainer.classList.add('hidden');
@@ -304,22 +342,26 @@
             }
 
             resultsContainer.classList.remove('hidden');
-            displayResults(durations, totalStartMinutes, totalEndMinutes, buffer, true); // Animate on initial calculation
+            displayResults(durations, totalStartMinutes, totalEndMinutes, buffer, true);
             
             if (numBreaks === 4) {
                 const sortedBreaks = [...durations].sort((a,b) => a-b);
                 initialFourBreakDurations = [sortedBreaks[0], sortedBreaks[1], sortedBreaks[2], sortedBreaks[3]];
                 
-                const maxTransfer = Math.floor(((sortedBreaks[2] + sortedBreaks[3]) - (sortedBreaks[0] + sortedBreaks[1])) / 2);
-                
-                breakSlider.max = maxTransfer > 0 ? maxTransfer : 0;
-                breakSlider.value = 0;
+                maxAdjustment = Math.floor(((sortedBreaks[2] + sortedBreaks[3]) - (sortedBreaks[0] + sortedBreaks[1])) / 2);
+                maxAdjustment = Math.floor(maxAdjustment / 5) * 5; // Ensure it's a multiple of 5
+
+                adjustmentAmount = 0;
+                adjustmentDisplay.textContent = '0m';
                 
                 sliderStartMinutes = totalStartMinutes;
                 sliderEndMinutes = totalEndMinutes;
                 sliderBuffer = buffer;
                 
-                sliderContainer.classList.remove('hidden');
+                minusBtn.disabled = true;
+                plusBtn.disabled = maxAdjustment <= 0;
+                
+                adjustmentContainer.classList.remove('hidden');
             }
         }
         
@@ -439,7 +481,7 @@
             summaryDiv.innerHTML = '';
             timelineContainer.innerHTML = '';
             secondServiceTimeDiv.classList.add('hidden');
-            sliderContainer.classList.add('hidden');
+            adjustmentContainer.classList.add('hidden');
         }
 
         function parseHHMM(timeString) {
