@@ -41,6 +41,19 @@
         .header { text-align: center; margin-bottom: 2rem; }
         .header .logo { display: block; margin-left: auto; margin-right: auto; height: 48px; margin-bottom: 1rem; }
         .header h1 { font-size: 1.875rem; font-weight: 700; color: #1e293b; margin: 0; }
+        .update-button {
+            background-color: #f59e0b; /* amber-500 */
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px; /* rounded-full */
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+        .update-button:hover { background-color: #d97706; /* amber-600 */ }
+
 
         /* --- Form --- */
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
@@ -106,6 +119,7 @@
                 <div class="header">
                     <img src="https://media.faaa.com.au/logo/faaa_logo.png" alt="FAAA Logo" class="logo">
                     <h1>Inflight Rest Calculator</h1>
+                    <button id="update-btn" class="hidden update-button">Update Available - Tap to Install</button>
                 </div>
 
                 <div id="restForm" class="form-grid">
@@ -358,13 +372,39 @@
             return `${h > 0 ? h + 'h ' : ''}${m > 0 ? m + 'm' : ''}`.trim() || '0m';
         }
 
-        // --- PWA Service Worker Registration ---
+        // --- PWA Service Worker Registration & Update ---
+        let newWorker;
+
+        function showUpdateBar() {
+            const updateBtn = document.getElementById('update-btn');
+            updateBtn.classList.remove('hidden');
+            updateBtn.addEventListener('click', () => {
+                updateBtn.textContent = 'Updating...';
+                newWorker.postMessage({ action: 'skipWaiting' });
+            });
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, err => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    console.log('ServiceWorker registration successful.');
+                    reg.addEventListener('updatefound', () => {
+                        newWorker = reg.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                showUpdateBar();
+                            }
+                        });
+                    });
+                }).catch(err => {
                     console.log('ServiceWorker registration failed: ', err);
+                });
+
+                let refreshing;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    window.location.reload();
+                    refreshing = true;
                 });
             });
         }
