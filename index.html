@@ -268,7 +268,7 @@
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <p>Version 1.0.3</p>
+             <p>Version 1.0.4</p>
         </footer>
     </div>
     
@@ -597,16 +597,21 @@
 
             updateStatus.textContent = 'Checking...';
             updateStatus.classList.remove('hidden');
+            
+            // Get the current registration to update it
+            navigator.serviceWorker.getRegistration().then(reg => {
+                if (!reg) {
+                    // This case is unlikely if the app loaded, but it's a good safeguard
+                    updateStatus.textContent = 'App not fully installed.';
+                    setTimeout(() => updateStatus.classList.add('hidden'), 3000);
+                    return;
+                }
 
-            navigator.serviceWorker.register('sw.js').then(reg => {
-                reg.update().then(() => {
-                    if (reg.installing) {
-                        // The 'updatefound' listener will handle it.
-                        console.log("Update found, waiting for installation.");
-                    } else if (reg.waiting) {
-                        newWorker = reg.waiting;
-                        showUpdatePrompt();
-                    } else {
+                reg.update().then(newReg => {
+                    // Check if an update was found and is waiting or installing.
+                    // The 'updatefound' event listener will handle showing the prompt.
+                    // If neither is true, then we are up to date.
+                    if (!newReg.installing && !newReg.waiting) {
                         updateStatus.textContent = 'App is up to date.';
                         setTimeout(() => {
                             updateStatus.classList.add('hidden');
@@ -641,7 +646,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
                     console.log('ServiceWorker registration successful.');
                     reg.addEventListener('updatefound', () => {
                         updateStatus.classList.add('hidden'); // Hide any "checking" message
