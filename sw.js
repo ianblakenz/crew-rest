@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inflight-rest-cache-v7'; // Version bumped to v7
+const CACHE_NAME = 'inflight-rest-cache-v8'; // Version bumped to v8
 const urlsToCache = [
   './',
   './index.html',
@@ -17,7 +17,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// This new 'activate' event is crucial for deleting old caches
+// This 'activate' event is crucial for deleting old caches
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -25,7 +25,6 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
-            // If this cache name is not in our whitelist, delete it.
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -50,7 +49,9 @@ self.addEventListener('fetch', event => {
   );
 });
 
+// --- THIS IS THE CRUCIAL NEW PART ---
 // This listener waits for the "skipWaiting" message from the UI
+// and forces the new service worker to take control.
 self.addEventListener('message', (event) => {
   if (event.data && event.data.action === 'skipWaiting') {
     self.skipWaiting();

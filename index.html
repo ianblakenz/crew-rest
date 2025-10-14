@@ -285,7 +285,7 @@
                 <button id="check-update-btn" class="check-update-button">Check for Updates</button>
                 <p id="update-status" class="hidden"></p>
             </div>
-             <p>Version 1.0.10</p>
+             <p>Version 1.0.11</p>
         </footer>
     </div>
     
@@ -620,12 +620,17 @@
             updateStatus.textContent = 'Checking...';
             updateStatus.classList.remove('hidden');
             
-            navigator.serviceWorker.register('./sw.js').then(reg => {
-                reg.update().then(() => {
-                    if (reg.installing || reg.waiting) {
-                        // The 'updatefound' listener will handle it, or it's already waiting
-                        // No "up to date" message needed here
+            navigator.serviceWorker.register('./sw.js').then(registration => {
+                registration.update().then(() => {
+                    const installingWorker = registration.installing;
+                    if (installingWorker) {
+                        // Update found, the 'updatefound' event will handle it
+                    } else if (registration.waiting) {
+                         // An update is already waiting, show the prompt
+                        newWorker = registration.waiting;
+                        showUpdatePrompt();
                     } else {
+                        // No update available
                         updateStatus.textContent = 'App is up to date.';
                         setTimeout(() => {
                             updateStatus.classList.add('hidden');
@@ -642,15 +647,14 @@
         const installBtn = document.getElementById('install-btn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
             deferredPrompt = e;
-            // Show the install button
             installBtn.classList.remove('hidden');
         });
 
         installBtn.addEventListener('click', () => {
             installBtn.classList.add('hidden');
+            if (!deferredPrompt) return;
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
@@ -671,9 +675,8 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(reg => {
-                    console.log('ServiceWorker registration successful.');
                     reg.addEventListener('updatefound', () => {
-                        updateStatus.classList.add('hidden'); // Hide any "checking" message
+                        updateStatus.classList.add('hidden');
                         newWorker = reg.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
