@@ -598,7 +598,7 @@
             updateStatus.textContent = 'Checking...';
             updateStatus.classList.remove('hidden');
 
-            navigator.serviceWorker.register('./sw.js').then(reg => {
+            navigator.serviceWorker.register('sw.js').then(reg => {
                 reg.update().then(() => {
                     if (reg.installing) {
                         // The 'updatefound' listener will handle it.
@@ -641,7 +641,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
                     console.log('ServiceWorker registration successful.');
                     reg.addEventListener('updatefound', () => {
                         updateStatus.classList.add('hidden'); // Hide any "checking" message
