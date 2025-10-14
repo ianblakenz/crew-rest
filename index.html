@@ -54,7 +54,7 @@
         .install-button:hover { background-color: #15803d; }
         .check-update-button {
             background-color: #475569; color: white; font-weight: 500; padding: 0.4rem 0.8rem;
-            border-radius: 9999px; border: none; cursor: pointer; margin-top: 1rem; transition: all 0.2s;
+            border-radius: 9999px; border: none; cursor: pointer; transition: all 0.2s;
             font-size: 0.75rem;
         }
         .check-update-button:hover { background-color: #334155; }
@@ -181,6 +181,23 @@
         }
         #adjustment-display { font-size: 1.125rem; font-weight: 600; color: #334155; min-width: 60px; text-align: center; }
         
+        /* --- iOS Install Prompt --- */
+        #ios-install-prompt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 42, 108, 0.95);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+        }
+        #ios-install-prompt p { margin: 0; }
+        #ios-install-prompt .share-icon { display: inline-block; vertical-align: middle; width: 1.2em; height: 1.2em; margin: 0 0.2rem; }
+        
         /* --- ANIMATIONS --- */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -199,10 +216,6 @@
                     <img src="https://media.faaa.com.au/logo/faaa_logo.png" alt="FAAA Logo" class="logo">
                     <h1>Inflight Rest Calculator</h1>
                     <button id="install-btn" class="hidden install-button">Add to Home Screen</button>
-                    <div id="update-container" class="mt-2">
-                        <button id="check-update-btn" class="check-update-button">Check for Updates</button>
-                        <p id="update-status" class="hidden"></p>
-                    </div>
                 </div>
 
                 <div id="restForm" class="form-grid">
@@ -268,6 +281,10 @@
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
+             <div id="update-container" class="mb-2">
+                <button id="check-update-btn" class="check-update-button">Check for Updates</button>
+                <p id="update-status" class="hidden"></p>
+            </div>
              <p>Version 1.0.2</p>
         </footer>
     </div>
@@ -279,6 +296,11 @@
             <p>A new version of the app is ready. Update now to get the latest features.</p>
             <button id="update-now-btn" class="update-now-btn">Update Now</button>
         </div>
+    </div>
+
+    <!-- iOS Install Prompt -->
+    <div id="ios-install-prompt" class="hidden">
+        <p>To install this app, tap the <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="share-icon"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> icon and then 'Add to Home Screen'.</p>
     </div>
     
     <script>
@@ -597,15 +619,12 @@
 
             updateStatus.textContent = 'Checking...';
             updateStatus.classList.remove('hidden');
-
-            navigator.serviceWorker.register('sw.js').then(reg => {
+            
+            navigator.serviceWorker.register('./sw.js').then(reg => {
                 reg.update().then(() => {
-                    if (reg.installing) {
-                        // The 'updatefound' listener will handle it.
-                        console.log("Update found, waiting for installation.");
-                    } else if (reg.waiting) {
-                        newWorker = reg.waiting;
-                        showUpdatePrompt();
+                    if (reg.installing || reg.waiting) {
+                        // The 'updatefound' listener will handle it, or it's already waiting
+                        // No "up to date" message needed here
                     } else {
                         updateStatus.textContent = 'App is up to date.';
                         setTimeout(() => {
@@ -623,8 +642,10 @@
         const installBtn = document.getElementById('install-btn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
             deferredPrompt = e;
+            // Show the install button
             installBtn.classList.remove('hidden');
         });
 
@@ -639,9 +660,17 @@
             });
         });
 
+        // iOS Install prompt
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+        if (isIOS && !isInStandaloneMode) {
+            document.getElementById('install-btn').classList.add('hidden');
+            document.getElementById('ios-install-prompt').classList.remove('hidden');
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
                     console.log('ServiceWorker registration successful.');
                     reg.addEventListener('updatefound', () => {
                         updateStatus.classList.add('hidden'); // Hide any "checking" message
