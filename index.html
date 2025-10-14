@@ -281,10 +281,6 @@
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <div id="update-container" class="mb-2">
-                <button id="check-update-btn" class="check-update-button">Check for Updates</button>
-                <p id="update-status" class="hidden"></p>
-            </div>
              <p>Version 1.0.2</p>
         </footer>
     </div>
@@ -619,12 +615,15 @@
 
             updateStatus.textContent = 'Checking...';
             updateStatus.classList.remove('hidden');
-            
-            navigator.serviceWorker.register('./sw.js').then(reg => {
+
+            navigator.serviceWorker.register('sw.js').then(reg => {
                 reg.update().then(() => {
-                    if (reg.installing || reg.waiting) {
-                        // The 'updatefound' listener will handle it, or it's already waiting
-                        // No "up to date" message needed here
+                    if (reg.installing) {
+                        // The 'updatefound' listener will handle it.
+                        console.log("Update found, waiting for installation.");
+                    } else if (reg.waiting) {
+                        newWorker = reg.waiting;
+                        showUpdatePrompt();
                     } else {
                         updateStatus.textContent = 'App is up to date.';
                         setTimeout(() => {
