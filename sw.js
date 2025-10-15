@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inflight-rest-cache-v12'; // Version bumped to v12
+const CACHE_NAME = 'inflight-rest-cache-20'; // Version bumped to v20
 const urlsToCache = [
   './',
   './index.html',
@@ -33,31 +33,33 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Stale-while-revalidate strategy
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        // Not in cache, fetch it from the network, and cache it
-        return fetch(event.request).then(
-          networkResponse => {
-            if(!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic' && networkResponse.type !== 'cors') {
-              return networkResponse;
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.match(event.request).then(cachedResponse => {
+        // Fetch from the network in the background to update the cache for next time.
+        const networkFetch = fetch(event.request)
+          .then(networkResponse => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
             }
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
             return networkResponse;
-          }
-        );
-      })
+          })
+          .catch(err => {
+             // Handle network errors if necessary, though for this strategy,
+             // we've already returned the cached response.
+             console.log('Network fetch failed:', err);
+          });
+
+        // Return the cached response immediately if it exists, 
+        // otherwise wait for the network fetch to complete.
+        return cachedResponse || networkFetch;
+      });
+    })
   );
 });
+
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.action === 'skipWaiting') {
