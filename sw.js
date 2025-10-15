@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inflight-rest-cache-v8'; // Version bumped to v8
+const CACHE_NAME = 'inflight-rest-cache-v9'; // Version bumped to v9
 const urlsToCache = [
   './',
   './index.html',
@@ -34,22 +34,27 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Serve cached content when offline
+// --- FETCH STRATEGY CHANGED TO NETWORK-FIRST ---
+// This will always try to fetch from the network first.
+// If the network fails (offline), it will fall back to the cache.
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+    fetch(event.request).then(networkResponse => {
+      // If the fetch is successful, we update the cache with the new version
+      return caches.open(CACHE_NAME).then(cache => {
+        cache.put(event.request, networkResponse.clone());
+        // And return the fresh response from the network
+        return networkResponse;
+      });
+    }).catch(() => {
+      // If the fetch fails (e.g., the user is offline),
+      // we then try to serve the file from the cache.
+      return caches.match(event.request);
+    })
   );
 });
 
-// --- THIS IS THE CRUCIAL NEW PART ---
+
 // This listener waits for the "skipWaiting" message from the UI
 // and forces the new service worker to take control.
 self.addEventListener('message', (event) => {
