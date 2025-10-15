@@ -273,7 +273,7 @@
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <p>Version 1.1.4abcdef</p>
+             <p>Version 1.0.3</p>
         </footer>
     </div>
     
@@ -585,7 +585,6 @@
 
         // --- PWA Service Worker Registration & Update ---
         let newWorker;
-        let registration;
 
         function showUpdatePrompt() {
             const updateModal = document.getElementById('update-modal');
@@ -629,7 +628,6 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(reg => {
-                    registration = reg;
                     reg.addEventListener('updatefound', () => {
                         newWorker = reg.installing;
                         newWorker.addEventListener('statechange', () => {
