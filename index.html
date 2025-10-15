@@ -52,14 +52,6 @@
             border-radius: 9999px; border: none; cursor: pointer; margin-top: 1rem; transition: all 0.2s;
         }
         .install-button:hover { background-color: #15803d; }
-        .check-update-button {
-            background-color: #475569; color: white; font-weight: 500; padding: 0.4rem 0.8rem;
-            border-radius: 9999px; border: none; cursor: pointer; transition: all 0.2s;
-            font-size: 0.75rem;
-        }
-        .check-update-button:hover { background-color: #334155; }
-        #update-status { font-size: 0.75rem; color: #64748b; margin-top: 0.5rem; }
-
         
         /* --- UPDATE MODAL --- */
         .update-modal-overlay {
@@ -281,11 +273,7 @@
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <div id="update-container" class="mb-2">
-                <button id="check-update-btn" class="check-update-button">Check for Updates</button>
-                <p id="update-status" class="hidden"></p>
-            </div>
-             <p>Version 1.0.13</p>
+             <p>Version 1.1.2</p>
         </footer>
     </div>
     
@@ -321,8 +309,6 @@
         const plusBtn = document.getElementById('plus-btn');
         const minusBtn = document.getElementById('minus-btn');
         const adjustmentDisplay = document.getElementById('adjustment-display');
-        const checkUpdateBtn = document.getElementById('check-update-btn');
-        const updateStatus = document.getElementById('update-status');
         
         // --- GLOBAL STATE for adjustment ---
         let initialFourBreakDurations = null;
@@ -599,6 +585,7 @@
 
         // --- PWA Service Worker Registration & Update ---
         let newWorker;
+        let registration;
 
         function showUpdatePrompt() {
             const updateModal = document.getElementById('update-modal');
@@ -607,39 +594,6 @@
             updateNowBtn.addEventListener('click', () => {
                 updateNowBtn.textContent = 'Updating...';
                 newWorker.postMessage({ action: 'skipWaiting' });
-            });
-        }
-
-        function manualCheckForUpdate() {
-            if (!('serviceWorker' in navigator)) {
-                updateStatus.textContent = 'PWA features not supported.';
-                updateStatus.classList.remove('hidden');
-                return;
-            }
-
-            updateStatus.textContent = 'Checking...';
-            updateStatus.classList.remove('hidden');
-            
-            navigator.serviceWorker.register('./sw.js').then(registration => {
-                registration.update().then(() => {
-                    const installingWorker = registration.installing;
-                    if (installingWorker) {
-                        // Update found, the 'updatefound' event will handle it
-                    } else if (registration.waiting) {
-                         // An update is already waiting, show the prompt
-                        newWorker = registration.waiting;
-                        showUpdatePrompt();
-                    } else {
-                        // No update available
-                        updateStatus.textContent = 'App is up to date.';
-                        setTimeout(() => {
-                            updateStatus.classList.add('hidden');
-                        }, 3000);
-                    }
-                });
-            }).catch(error => {
-                updateStatus.textContent = 'Update check failed.';
-                console.error('Error during service worker update check:', error);
             });
         }
         
@@ -675,8 +629,8 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(reg => {
+                    registration = reg;
                     reg.addEventListener('updatefound', () => {
-                        updateStatus.classList.add('hidden');
                         newWorker = reg.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
@@ -696,7 +650,7 @@
                 });
             });
         }
-        checkUpdateBtn.addEventListener('click', manualCheckForUpdate);
+        
     </script>
 
 </body>
