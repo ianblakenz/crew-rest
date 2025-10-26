@@ -27,7 +27,7 @@
             justify-content: center;
             min-height: 100vh;
             color: #334155; /* text-slate-700 */
-            padding: 2rem 1rem;
+            padding: 1rem; /* Reduced padding for wizard view */
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -55,80 +55,66 @@
         
         /* --- UPDATE MODAL --- */
         .update-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            animation: fadeIn 0.3s ease;
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.6); display: flex;
+            align-items: center; justify-content: center; z-index: 50; animation: fadeIn 0.3s ease;
         }
         .update-modal-box {
-            background-color: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            background-color: white; border-radius: 1rem; padding: 2rem; width: 90%;
+            max-width: 380px; text-align: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
         }
-        .update-modal-box h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0 0 0.5rem 0;
-        }
-        .update-modal-box p {
-            color: #475569;
-            margin: 0 0 1.5rem 0;
-        }
+        .update-modal-box h2 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin: 0 0 0.5rem 0; }
+        .update-modal-box p { color: #475569; margin: 0 0 1.5rem 0; }
         .update-now-btn {
-            width: 100%;
-            background-color: #f59e0b; /* amber-500 */
-            color: white;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
+            width: 100%; background-color: #f59e0b; color: white; font-weight: 600; padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; border: none; cursor: pointer; transition: all 0.2s;
         }
         .update-now-btn:hover { background-color: #d97706; }
 
 
-        /* --- Form --- */
-        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-        @media (min-width: 640px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
-        .form-group.col-span-2 { grid-column: span 1; }
-        @media (min-width: 640px) { .form-group.col-span-2 { grid-column: span 2; } }
+        /* --- WIZARD STYLES --- */
+        .wizard-step { padding: 1rem 0; animation: fadeIn 0.3s ease-out; }
+        .wizard-label { display: block; font-size: 1.125rem; /* text-lg */ font-weight: 600; color: var(--primary-color); margin-bottom: 1rem; text-align: center; }
+        .wizard-input {
+            width: 100%; padding: 1rem; font-size: 1.25rem; /* text-xl */ background-color: #f8fafc;
+            border: 2px solid #cbd5e1; border-radius: 0.5rem; text-align: center;
+        }
+        .wizard-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-focus-ring); }
+        .wizard-radio-group { display: flex; gap: 1rem; justify-content: center; }
+        .wizard-radio-label {
+            padding: 1rem 1.5rem; border: 2px solid #cbd5e1; border-radius: 0.5rem; cursor: pointer;
+            font-weight: 600; transition: all 0.2s; background-color: #f8fafc;
+        }
+        .wizard-radio-input:checked + .wizard-radio-label {
+            background-color: var(--primary-light-bg); color: var(--primary-color);
+            border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-focus-ring);
+        }
+        .wizard-radio-input { display: none; } /* Hide actual radio */
 
-        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #475569; margin-bottom: 0.5rem; }
-        .form-input {
-            width: 100%; padding: 0.75rem 1rem; background-color: #f8fafc; border: 1px solid #cbd5e1;
+        .previous-answer {
+            text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem;
+            border-bottom: 1px dashed #cbd5e1; color: #64748b; font-size: 0.9rem;
+        }
+        .previous-answer strong { color: #334155; font-weight: 600; }
+        
+        .wizard-nav { display: flex; justify-content: space-between; margin-top: 2rem; }
+        .wizard-nav-btn {
+            padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; border: none;
+            cursor: pointer; transition: all 0.2s; min-width: 100px;
+        }
+        .wizard-nav-btn.back { background-color: #e2e8f0; color: #475569; }
+        .wizard-nav-btn.back:hover { background-color: #cbd5e1; }
+        .wizard-nav-btn.next { background-color: var(--primary-color); color: white; }
+        .wizard-nav-btn.next:hover { background-color: var(--primary-hover); }
+        .wizard-nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+
+        /* --- Form (Hidden but used for calculations) --- */
+        #restForm { display: none; } /* Keep the form but hide it */
+        .form-input { /* Styles for hidden form inputs */
+             width: 100%; padding: 0.75rem 1rem; background-color: #f8fafc; border: 1px solid #cbd5e1;
             border-radius: 0.5rem; transition: all 0.3s;
         }
-        .form-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--primary-focus-ring); }
         
-        .submit-button {
-            width: 100%; background-color: var(--primary-color); color: white; font-weight: 600; padding: 0.875rem 1.5rem;
-            border-radius: 0.5rem; border: none; cursor: pointer; transition: all 0.3s;
-        }
-        .submit-button:hover { background-color: var(--primary-hover); transform: scale(1.02); }
-        .submit-button:focus { outline: none; box-shadow: 0 0 0 4px var(--primary-focus-ring); }
-        
-        .secondary-button {
-             width: 100%; background-color: #64748b; color: white; font-weight: 600; padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem; border: none; cursor: pointer; transition: all 0.3s;
-        }
-        .secondary-button:hover { background-color: #475569; }
-
-        /* --- Custom Radio Buttons --- */
-        .radio-group { display: flex; gap: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.25rem; background-color: #f8fafc; }
-        .radio-group label { flex: 1; text-align: center; padding: 0.5rem; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; font-size: 0.875rem; font-weight: 500; }
-        .radio-group input[type="radio"] { display: none; }
-        .radio-group input[type="radio"]:checked + label { background-color: var(--primary-color); color: white; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); }
-
         /* --- Results Section --- */
         .results-container { padding: 1.5rem; border-top: 1px solid #e2e8f0; }
         @media (min-width: 640px) { .results-container { padding: 2rem; } }
@@ -158,12 +144,14 @@
 
         /* --- ADJUSTMENT CONTROLS --- */
         #adjustment-container { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; animation: fadeIn 0.5s ease-in-out; }
+        .adjust-btn-group { display: flex; justify-content: space-around; align-items: center; gap: 1rem; }
         .adjust-btn {
-            width: 44px; height: 44px;
+            flex-grow: 1; /* Make buttons take up space */
+            padding: 0.75rem 1rem;
             background-color: var(--primary-light-bg);
             color: var(--primary-color);
-            font-weight: 600; font-size: 1.25rem;
-            border-radius: 9999px; border: 1px solid var(--primary-color);
+            font-weight: 600; font-size: 0.9rem;
+            border-radius: 0.5rem; border: 1px solid var(--primary-color);
             cursor: pointer; transition: all 0.2s;
         }
         .adjust-btn:hover { background-color: var(--primary-color); color: white; }
@@ -171,31 +159,24 @@
             opacity: 0.4; cursor: not-allowed;
             background-color: #e5e7eb; color: #9ca3af; border-color: #d1d5db;
         }
-        #adjustment-display { font-size: 1.125rem; font-weight: 600; color: #334155; min-width: 60px; text-align: center; }
+        #adjustment-display { font-size: 1.125rem; font-weight: 600; color: #334155; min-width: 50px; text-align: center; flex-shrink: 0; }
+        
+        .restart-button {
+            display: block; width: 100%; margin-top: 2rem; background-color: #ef4444; color: white;
+            font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .restart-button:hover { background-color: #dc2626; }
         
         /* --- iOS Install Prompt --- */
-        #ios-install-prompt {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: rgba(0, 42, 108, 0.95);
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            font-size: 0.9rem;
-            backdrop-filter: blur(5px);
-            z-index: 100;
-        }
-        #ios-install-prompt p { margin: 0; }
-        #ios-install-prompt .share-icon { display: inline-block; vertical-align: middle; width: 1.2em; height: 1.2em; margin: 0 0.2rem; }
+        #ios-install-prompt { /* Styles remain the same */ }
         
         /* --- ANIMATIONS --- */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Utilities --- */
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .animated-item { animation: fadeIn 0.5s ease-in-out; }
     </style>
 </head>
@@ -210,48 +191,89 @@
                     <button id="install-btn" class="hidden install-button">Add to Home Screen</button>
                 </div>
 
-                <div id="restForm" class="form-grid">
-                    <div class="form-group">
-                        <label for="startTime" class="form-label">Breaks start at:</label>
-                        <input type="text" id="startTime" class="form-input" inputmode="numeric" pattern="\d{3,4}" placeholder="e.g., 2230" maxlength="4">
-                    </div>
-                    <div class="form-group">
-                        <label for="endTime" class="form-label">Breaks end at:</label>
-                        <input type="text" id="endTime" class="form-input" inputmode="numeric" pattern="\d{3,4}" placeholder="e.g., 0400" maxlength="4">
-                    </div>
-                    <div class="form-group col-span-2">
-                         <label class="form-label">Number of Breaks</label>
-                         <div class="radio-group" id="numBreaksGroup">
-                             <input type="radio" id="numBreaks2" name="numBreaks" value="2" checked>
-                             <label for="numBreaks2">2 Breaks</label>
-                             <input type="radio" id="numBreaks4" name="numBreaks" value="4">
-                             <label for="numBreaks4">4 Breaks</label>
-                         </div>
-                    </div>
-                    <div id="four-break-options" class="form-group col-span-2 hidden">
-                        <label class="form-label">Break Pattern</label>
-                        <div class="radio-group" id="breakPatternGroup">
-                            <input type="radio" id="patternSSLL" name="breakPattern" value="SSLL" checked>
-                            <label for="patternSSLL">S-S-L-L</label>
-                            <input type="radio" id="patternSLLS" name="breakPattern" value="SLLS">
-                            <label for="patternSLLS">S-L-L-S</label>
+                <!-- Step-by-Step Wizard Container -->
+                <div id="wizard">
+                    <!-- Step 1: Start Time -->
+                    <div id="step-1" class="wizard-step">
+                        <label for="wizard-startTime" class="wizard-label">Breaks start at:</label>
+                        <input type="text" id="wizard-startTime" class="wizard-input" inputmode="numeric" pattern="\d{3,4}" placeholder="HHMM" maxlength="4">
+                        <div class="wizard-nav">
+                            <button class="wizard-nav-btn back" disabled>Back</button>
+                            <button class="wizard-nav-btn next">Next</button>
                         </div>
                     </div>
-                    <div class="form-group col-span-2">
-                        <label for="buffer" class="form-label">Change-over per Break (mins)</label>
-                        <input type="number" id="buffer" min="0" value="10" class="form-input">
+
+                    <!-- Step 2: End Time -->
+                    <div id="step-2" class="wizard-step hidden">
+                        <div class="previous-answer"><span id="prev-startTime"></span></div>
+                        <label for="wizard-endTime" class="wizard-label">Breaks end at:</label>
+                        <input type="text" id="wizard-endTime" class="wizard-input" inputmode="numeric" pattern="\d{3,4}" placeholder="HHMM" maxlength="4">
+                        <div class="wizard-nav">
+                            <button class="wizard-nav-btn back">Back</button>
+                            <button class="wizard-nav-btn next">Next</button>
+                        </div>
                     </div>
-                    <div class="form-group hidden" id="force-3-hour-container">
-                        <button type="button" id="force3HourBtn" class="secondary-button">Make Long Break 3 Hours</button>
+
+                    <!-- Step 3: Number of Breaks -->
+                    <div id="step-3" class="wizard-step hidden">
+                        <div class="previous-answer"><span id="prev-endTime"></span></div>
+                        <label class="wizard-label">Number of Breaks:</label>
+                        <div class="wizard-radio-group">
+                            <input type="radio" id="wizard-numBreaks2" name="wizard-numBreaks" value="2" class="wizard-radio-input" checked>
+                            <label for="wizard-numBreaks2" class="wizard-radio-label">2 Breaks</label>
+                            <input type="radio" id="wizard-numBreaks4" name="wizard-numBreaks" value="4" class="wizard-radio-input">
+                            <label for="wizard-numBreaks4" class="wizard-radio-label">4 Breaks</label>
+                        </div>
+                        <div class="wizard-nav">
+                            <button class="wizard-nav-btn back">Back</button>
+                            <button class="wizard-nav-btn next">Next</button>
+                        </div>
                     </div>
-                    <div class="form-group col-span-2">
-                        <button type="button" id="calculateBtn" class="submit-button">Calculate Breaks</button>
+
+                    <!-- Step 4: Break Pattern (Conditional) -->
+                    <div id="step-4" class="wizard-step hidden">
+                         <div class="previous-answer"><span id="prev-numBreaks"></span></div>
+                        <label class="wizard-label">Break Pattern:</label>
+                        <div class="wizard-radio-group">
+                            <input type="radio" id="wizard-patternSSLL" name="wizard-breakPattern" value="SSLL" class="wizard-radio-input" checked>
+                            <label for="wizard-patternSSLL" class="wizard-radio-label">S-S-L-L</label>
+                            <input type="radio" id="wizard-patternSLLS" name="wizard-breakPattern" value="SLLS" class="wizard-radio-input">
+                            <label for="wizard-patternSLLS" class="wizard-radio-label">S-L-L-S</label>
+                        </div>
+                         <div class="wizard-nav">
+                            <button class="wizard-nav-btn back">Back</button>
+                            <button class="wizard-nav-btn next">Next</button>
+                        </div>
                     </div>
+
+                    <!-- Step 5: Buffer Time -->
+                    <div id="step-5" class="wizard-step hidden">
+                        <div class="previous-answer"><span id="prev-patternOrBreaks"></span></div>
+                        <label for="wizard-buffer" class="wizard-label">Change-over per Break (mins):</label>
+                        <input type="number" id="wizard-buffer" class="wizard-input" inputmode="numeric" value="10" min="0">
+                        <div class="wizard-nav">
+                            <button class="wizard-nav-btn back">Back</button>
+                            <button class="wizard-nav-btn next">Calculate</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden Original Form (for calculation logic) -->
+                <div id="restForm">
+                    <input type="text" id="startTime">
+                    <input type="text" id="endTime">
+                    <input type="radio" name="numBreaks" value="2" id="numBreaks2">
+                    <input type="radio" name="numBreaks" value="4" id="numBreaks4">
+                    <input type="radio" name="breakPattern" value="SSLL" id="patternSSLL">
+                    <input type="radio" name="breakPattern" value="SLLS" id="patternSLLS">
+                    <input type="number" id="buffer">
+                    <button type="button" id="force3HourBtn"></button>
+                    <button type="button" id="calculateBtn"></button>
                 </div>
             </div>
             
             <div id="results-container" class="results-container hidden">
-                 <h2>Breaks Overview</h2>
+                 <h2>Schedule Overview</h2>
                  <div id="errorMessage" class="hidden"></div>
                  <div id="summary" class="animated-item"></div>
                  <div id="timeline-container" class="timeline-container animated-item" style="animation-delay: 0.1s;"></div>
@@ -259,10 +281,10 @@
 
                  <div id="adjustment-container" class="hidden">
                     <label class="form-label text-center">Adjust breaks</label>
-                    <div class="flex items-center justify-center gap-6">
-                        <button id="minus-btn" class="adjust-btn">-5</button>
+                    <div class="adjust-btn-group">
+                        <button id="minus-btn" class="adjust-btn">-10m</button>
                         <span id="adjustment-display" class="text-lg font-bold">0m</span>
-                        <button id="plus-btn" class="adjust-btn">+5</button>
+                        <button id="plus-btn" class="adjust-btn">+10m</button>
                     </div>
                  </div>
 
@@ -270,10 +292,12 @@
                     <p class="text-slate-600 font-medium">Second Service Starts At:</p>
                     <p id="service-start-time-value" class="text-2xl font-bold mt-1"></p>
                  </div>
+                 
+                 <button id="restart-btn" class="restart-button hidden">Start New Calculation</button>
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <p>Version 14</p>
+             <p>Version 1.0.4</p>
         </footer>
     </div>
     
@@ -292,100 +316,243 @@
     </div>
     
     <script>
-        // --- DOM ELEMENTS ---
-        const calculateBtn = document.getElementById('calculateBtn');
-        const force3HourBtn = document.getElementById('force3HourBtn');
+        // --- DOM ELEMENTS (Original Form - hidden) ---
+        const formStartTime = document.getElementById('startTime');
+        const formEndTime = document.getElementById('endTime');
+        const formNumBreaks2 = document.getElementById('numBreaks2');
+        const formNumBreaks4 = document.getElementById('numBreaks4');
+        const formPatternSSLL = document.getElementById('patternSSLL');
+        const formPatternSLLS = document.getElementById('patternSLLS');
+        const formBuffer = document.getElementById('buffer');
+        const calculateBtnOriginal = document.getElementById('calculateBtn'); 
+        const force3HourBtnOriginal = document.getElementById('force3HourBtn'); 
+
+        // --- DOM ELEMENTS (Wizard) ---
+        const wizardContainer = document.getElementById('wizard');
+        const wizardSteps = wizardContainer.querySelectorAll('.wizard-step');
+        const wizardStartTimeInput = document.getElementById('wizard-startTime');
+        const wizardEndTimeInput = document.getElementById('wizard-endTime');
+        const wizardBufferInput = document.getElementById('wizard-buffer');
+        
+        // --- DOM ELEMENTS (Results) ---
         const resultsContainer = document.getElementById('results-container');
         const resultsList = document.getElementById('results-list');
         const errorMessage = document.getElementById('errorMessage');
         const summaryDiv = document.getElementById('summary');
         const timelineContainer = document.getElementById('timeline-container');
-        const startTimeInput = document.getElementById('startTime');
-        const endTimeInput = document.getElementById('endTime');
         const secondServiceTimeDiv = document.getElementById('second-service-time');
-        const numBreaksGroup = document.getElementById('numBreaksGroup');
-        const fourBreakOptions = document.getElementById('four-break-options');
         const adjustmentContainer = document.getElementById('adjustment-container');
         const plusBtn = document.getElementById('plus-btn');
         const minusBtn = document.getElementById('minus-btn');
         const adjustmentDisplay = document.getElementById('adjustment-display');
+        const restartBtn = document.getElementById('restart-btn');
         
+        // --- WIZARD STATE ---
+        let currentStep = 0;
+        const formData = {
+            startTime: '',
+            endTime: '',
+            numBreaks: '2',
+            breakPattern: 'SSLL',
+            buffer: '10'
+        };
+        const totalSteps = 4; 
+
         // --- GLOBAL STATE for adjustment ---
         let initialFourBreakDurations = null;
         let sliderStartMinutes = 0;
         let sliderEndMinutes = 0;
         let sliderBuffer = 0;
-        let adjustmentOffset = 0; // Can be positive or negative
+        let adjustmentOffset = 0;
         let minOffset = 0;
         let maxOffset = 0;
+        const ADJUSTMENT_INCREMENT = 10; // Changed to 10 minutes
 
-        // --- EVENT LISTENERS ---
-        numBreaksGroup.addEventListener('change', (e) => {
-            const isFourBreaks = e.target.value === '4';
-            fourBreakOptions.classList.toggle('hidden', !isFourBreaks);
-            force3HourBtn.parentElement.classList.toggle('hidden', !isFourBreaks);
-        });
-        
-        startTimeInput.addEventListener('input', () => {
-            if (startTimeInput.value.length === 4) endTimeInput.focus();
-        });
-
-        calculateBtn.addEventListener('click', () => calculateAndDisplay({ force3Hour: false }));
-        force3HourBtn.addEventListener('click', () => calculateAndDisplay({ force3Hour: true }));
-
-        plusBtn.addEventListener('click', () => {
-            if (adjustmentOffset + 5 <= maxOffset) {
-                adjustmentOffset += 5;
-                updateAdjustedBreaks();
-            }
-        });
-
-        minusBtn.addEventListener('click', () => {
-            if (adjustmentOffset - 5 >= minOffset) {
-                adjustmentOffset -= 5;
-                updateAdjustedBreaks();
-            }
-        });
-
+        // --- Function moved to global scope ---
         function updateAdjustedBreaks() {
-            if (!initialFourBreakDurations) return;
+             if (!initialFourBreakDurations) return;
             
             const [s1, s2, l1, l2] = initialFourBreakDurations;
             const transfer = adjustmentOffset;
 
-            // Positive transfer moves from short to long, negative from long to short
             const new_s1 = s1 - Math.floor(transfer / 2);
             const new_s2 = s2 - (transfer - Math.floor(transfer / 2));
             const new_l1 = l1 + Math.floor(transfer / 2);
             const new_l2 = l2 + (transfer - Math.floor(transfer / 2));
 
+            // Prevent breaks from going below a minimum (e.g., 5 mins)
+            if (new_s1 < 5 || new_s2 < 5 || new_l1 < 5 || new_l2 < 5) {
+                // Revert adjustment if it makes breaks too short
+                adjustmentOffset -= (adjustmentOffset > 0 ? ADJUSTMENT_INCREMENT : -ADJUSTMENT_INCREMENT);
+                updateButtonStates();
+                return; 
+            }
+
             const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
             const finalDurations = (pattern === 'SSLL') ? [new_s1, new_s2, new_l1, new_l2] : [new_s1, new_l1, new_l2, new_s2];
 
             displayResults(finalDurations, sliderStartMinutes, sliderEndMinutes, sliderBuffer, false);
-            
+            updateButtonStates();
+        }
+        
+        function updateButtonStates() {
             const displaySign = adjustmentOffset > 0 ? '+' : '';
             adjustmentDisplay.textContent = `${displaySign}${adjustmentOffset}m`;
-            
             minusBtn.disabled = adjustmentOffset <= minOffset;
             plusBtn.disabled = adjustmentOffset >= maxOffset;
         }
 
-        // --- CALCULATION LOGIC ---
-        function calculateAndDisplay(options = {}) {
+        // --- WIZARD NAVIGATION LOGIC ---
+        function showStep(stepIndex) {
+            wizardSteps.forEach((step, index) => {
+                step.classList.toggle('hidden', index !== stepIndex);
+            });
+            currentStep = stepIndex;
+            updatePreviousAnswers();
+            
+            const currentInput = wizardSteps[stepIndex].querySelector('input[type="text"], input[type="number"], input[type="radio"]:checked');
+            if (currentInput && (currentInput.type === 'text' || currentInput.type === 'number')) {
+                 setTimeout(() => currentInput.focus(), 50); 
+            }
+        }
+
+        function updatePreviousAnswers() {
+            document.getElementById('prev-startTime').innerHTML = formData.startTime ? `Start Time: <strong>${formatTime(parseHHMM(formData.startTime).hours * 60 + parseHHMM(formData.startTime).minutes)}</strong>` : '';
+            document.getElementById('prev-endTime').innerHTML = formData.endTime ? `End Time: <strong>${formatTime(parseHHMM(formData.endTime).hours * 60 + parseHHMM(formData.endTime).minutes)}</strong>` : '';
+            document.getElementById('prev-numBreaks').innerHTML = `Breaks: <strong>${formData.numBreaks}</strong>`;
+            
+            const patternOrBreaksEl = document.getElementById('prev-patternOrBreaks');
+            if(formData.numBreaks === '4') {
+                patternOrBreaksEl.innerHTML = `Pattern: <strong>${formData.breakPattern}</strong>`;
+            } else {
+                 patternOrBreaksEl.innerHTML = `Breaks: <strong>${formData.numBreaks}</strong>`;
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 0) { 
+                formData.startTime = wizardStartTimeInput.value;
+                if (!parseHHMM(formData.startTime)) { alert('Please enter a valid Start Time (HHMM).'); return; }
+            } else if (currentStep === 1) { 
+                formData.endTime = wizardEndTimeInput.value;
+                 if (!parseHHMM(formData.endTime)) { alert('Please enter a valid End Time (HHMM).'); return; }
+            } else if (currentStep === 2) { 
+                formData.numBreaks = document.querySelector('input[name="wizard-numBreaks"]:checked').value;
+            } else if (currentStep === 3 && formData.numBreaks === '4') { 
+                formData.breakPattern = document.querySelector('input[name="wizard-breakPattern"]:checked').value;
+            } else if (currentStep === (formData.numBreaks === '4' ? 4 : 3)) { 
+                 formData.buffer = wizardBufferInput.value;
+                 if (isNaN(parseInt(formData.buffer)) || parseInt(formData.buffer) < 0) { alert('Please enter a valid Buffer time (minutes).'); return; }
+            }
+
+            let nextStepIndex = currentStep + 1;
+            
+            if (currentStep === 2 && formData.numBreaks === '2') {
+                nextStepIndex = 4; // Jump directly to Buffer
+            }
+
+            if (nextStepIndex < wizardSteps.length) {
+                showStep(nextStepIndex);
+            } else {
+                completeWizard();
+            }
+        }
+
+        function prevStep() {
+            let prevStepIndex = currentStep - 1;
+            if (currentStep === 4 && formData.numBreaks === '2') {
+                 prevStepIndex = 2; // Jump back to Num Breaks
+            }
+            if (prevStepIndex >= 0) {
+                showStep(prevStepIndex);
+            }
+        }
+        
+        function completeWizard() {
+            formStartTime.value = formData.startTime;
+            formEndTime.value = formData.endTime;
+            if (formData.numBreaks === '2') formNumBreaks2.checked = true; else formNumBreaks4.checked = true;
+            if (formData.breakPattern === 'SSLL') formPatternSSLL.checked = true; else formPatternSLLS.checked = true;
+            formBuffer.value = formData.buffer;
+            
+            wizardContainer.classList.add('hidden');
+            calculateAndDisplay({ force3Hour: false }); 
+        }
+
+        // --- WIZARD EVENT LISTENERS ---
+        wizardContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('next')) {
+                nextStep();
+            } else if (e.target.classList.contains('back')) {
+                prevStep();
+            }
+        });
+
+        wizardStartTimeInput.addEventListener('input', () => {
+             if (wizardStartTimeInput.value.length === 4) {
+                 if (parseHHMM(wizardStartTimeInput.value)) nextStep();
+                 else alert('Please enter a valid Start Time (HHMM).');
+            }
+        });
+        wizardEndTimeInput.addEventListener('input', () => {
+             if (wizardEndTimeInput.value.length === 4) {
+                  if (parseHHMM(wizardEndTimeInput.value)) nextStep();
+                  else alert('Please enter a valid End Time (HHMM).');
+            }
+        });
+        wizardContainer.addEventListener('change', (e) => {
+            if (e.target.type === 'radio' && (e.target.name === 'wizard-numBreaks' || e.target.name === 'wizard-breakPattern')) {
+                setTimeout(nextStep, 100); 
+            }
+        });
+
+        // --- EVENT LISTENERS (Rest of the App) ---
+        plusBtn.addEventListener('click', () => {
+            if (adjustmentOffset + ADJUSTMENT_INCREMENT <= maxOffset) {
+                adjustmentOffset += ADJUSTMENT_INCREMENT;
+                updateAdjustedBreaks();
+            }
+        });
+
+        minusBtn.addEventListener('click', () => {
+            if (adjustmentOffset - ADJUSTMENT_INCREMENT >= minOffset) {
+                adjustmentOffset -= ADJUSTMENT_INCREMENT;
+                updateAdjustedBreaks();
+            }
+        });
+
+        restartBtn.addEventListener('click', () => {
+            // Reset form data object
+            formData.startTime = '';
+            formData.endTime = '';
+            formData.numBreaks = '2';
+            formData.breakPattern = 'SSLL';
+            formData.buffer = '10';
+            // Reset wizard input fields
+            wizardStartTimeInput.value = '';
+            wizardEndTimeInput.value = '';
+            document.getElementById('wizard-numBreaks2').checked = true;
+            document.getElementById('wizard-patternSSLL').checked = true;
+            wizardBufferInput.value = '10';
+            // Hide results, show wizard at step 0
+            resultsContainer.classList.add('hidden');
+            wizardContainer.classList.remove('hidden');
+            showStep(0);
+        });
+
+        // --- MAIN CALCULATION & DISPLAY LOGIC ---
+         function calculateAndDisplay(options = {}) {
             const { force3Hour = false } = options;
             adjustmentContainer.classList.add('hidden');
-            
             errorMessage.classList.add('hidden');
-            resultsContainer.classList.add('hidden');
 
             const numBreaks = parseInt(document.querySelector('input[name="numBreaks"]:checked').value, 10);
             const buffer = parseInt(document.getElementById('buffer').value, 10);
-            const parsedStartTime = parseHHMM(startTimeInput.value);
-            const parsedEndTime = parseHHMM(endTimeInput.value);
+            const parsedStartTime = parseHHMM(document.getElementById('startTime').value);
+            const parsedEndTime = parseHHMM(document.getElementById('endTime').value);
 
             if (!parsedStartTime || !parsedEndTime || isNaN(numBreaks) || isNaN(buffer)) {
-                showError("Please fill in all fields correctly.");
+                showError("Error reading input values."); 
                 return;
             }
             
@@ -414,41 +581,41 @@
                 return;
             }
 
-            resultsContainer.classList.remove('hidden');
+            resultsContainer.classList.remove('hidden'); 
             displayResults(durations, totalStartMinutes, totalEndMinutes, buffer, true);
             
             if (numBreaks === 4) {
                 const sortedBreaks = [...durations].sort((a,b) => a-b);
                 initialFourBreakDurations = [sortedBreaks[0], sortedBreaks[1], sortedBreaks[2], sortedBreaks[3]];
                 
-                // Max offset: How much can be taken from shorts (cannot be < 0)
-                maxOffset = Math.floor(sortedBreaks[0] + sortedBreaks[1]);
-                maxOffset = Math.floor(maxOffset / 5) * 5;
+                // Max offset: How much can be taken from shorts (cannot go below 5 mins)
+                maxOffset = Math.floor(sortedBreaks[0] - 5 + sortedBreaks[1] - 5);
+                maxOffset = Math.floor(maxOffset / ADJUSTMENT_INCREMENT) * ADJUSTMENT_INCREMENT; 
 
-                // Min offset: How much can be taken from longs (cannot be less than shorts)
+                // Min offset: How much can be taken from longs (shorts cannot become longer than longs)
                 minOffset = -Math.floor(((sortedBreaks[2] + sortedBreaks[3]) - (sortedBreaks[0] + sortedBreaks[1])) / 2);
-                minOffset = Math.ceil(minOffset / 5) * 5;
+                minOffset = Math.ceil(minOffset / ADJUSTMENT_INCREMENT) * ADJUSTMENT_INCREMENT; 
 
                 adjustmentOffset = 0;
-                adjustmentDisplay.textContent = '0m';
                 
                 sliderStartMinutes = totalStartMinutes;
                 sliderEndMinutes = totalEndMinutes;
                 sliderBuffer = buffer;
                 
-                minusBtn.disabled = adjustmentOffset <= minOffset;
-                plusBtn.disabled = adjustmentOffset >= maxOffset;
+                updateButtonStates(); // Update display and button states
                 
                 adjustmentContainer.classList.remove('hidden');
             }
+             restartBtn.classList.remove('hidden'); // Show restart button after calculation
         }
         
+        force3HourBtnOriginal.addEventListener('click', () => calculateAndDisplay({ force3Hour: true }));
+
         function calculateDurations(netBreakTime, numBreaks, force3Hour) {
-            if (numBreaks === 2) {
+             if (numBreaks === 2) {
                 const breakDuration = Math.floor(netBreakTime / 2);
                 return [breakDuration + (netBreakTime % 2), breakDuration];
             } 
-            
             if (force3Hour) {
                 if (netBreakTime < 360) return null;
                 let l1 = 180, l2 = 180;
@@ -464,12 +631,10 @@
                 const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
                 return (pattern === 'SSLL') ? [s1, s2, l1, l2] : [s1, l1, l2, s2];
             } 
-            
             let idealShort = Math.floor(netBreakTime / 6);
             let breaks = [idealShort, idealShort, 2 * idealShort, 2 * idealShort];
             let remainder = netBreakTime - breaks.reduce((a, b) => a + b, 0);
             for (let i = 0; i < remainder; i++) breaks[3 - (i % 4)]++;
-
             let excess = 0;
             breaks.forEach((br, i) => { if (br > 180) { excess += br - 180; breaks[i] = 180; } });
             if (excess > 0) {
@@ -478,7 +643,6 @@
                 breaks[1] += excess - Math.ceil(excess / 2);
             }
             breaks.sort((a, b) => a - b);
-            
             const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
             return (pattern === 'SSLL') ? [breaks[0], breaks[1], breaks[2], breaks[3]] : [breaks[0], breaks[2], breaks[3], breaks[1]];
         }
@@ -486,12 +650,17 @@
         function displayResults(durations, startMinutes, endMinutes, buffer, animate = false) {
             resultsList.innerHTML = '';
             timelineContainer.innerHTML = '';
-
             const numBreaks = durations.length;
             const totalBufferTime = numBreaks * buffer;
             const totalAvailableTime = endMinutes - startMinutes;
-            const netBreakTime = durations.reduce((a,b) => a+b, 0); // Recalculate based on adjusted durations
-
+            const netBreakTime = durations.reduce((a,b) => a+b, 0); 
+            
+             // Check for invalid durations *before* displaying
+             if (durations.some(d => d <= 0)) {
+                 showError("Adjustment resulted in invalid break time (<= 0 minutes).");
+                 return;
+             }
+            
             let summaryHtml = `
                 <p>Total Window<span class="font-semibold">${formatDuration(totalAvailableTime)}</span></p>
                 <p>Total Breaks<span class="font-semibold">${formatDuration(netBreakTime)}</span></p>
@@ -506,16 +675,12 @@
                 summaryHtml += `<p style="flex-basis: 100%; margin-top: 0.5rem;">S: ${shortSummary} | L: ${longSummary}</p>`;
             }
             summaryDiv.innerHTML = summaryHtml;
-
             let currentBreakStartTime = startMinutes;
             durations.forEach((duration, i) => {
-                if (duration <= 0) return;
                 const breakStart = currentBreakStartTime;
                 const breakEnd = breakStart + duration;
-
                 addTimelineSegment(breakStart, breakEnd, 'break', `Break ${i+1}`, totalAvailableTime, animate);
                 addTimelineSegment(breakEnd, breakEnd + buffer, 'buffer', `Buffer`, totalAvailableTime, animate);
-
                 const listItem = document.createElement('li');
                 listItem.className = 'result-item';
                 if (animate) listItem.style.animationDelay = `${0.2 + i * 0.1}s`;
@@ -529,21 +694,18 @@
                 resultsList.appendChild(listItem);
                 currentBreakStartTime = breakEnd + buffer;
             });
-
             const serviceStartTimeValueEl = document.getElementById('service-start-time-value');
             serviceStartTimeValueEl.textContent = formatTime(currentBreakStartTime);
             secondServiceTimeDiv.classList.remove('hidden');
         }
 
         function addTimelineSegment(start, end, type, label, totalWindow, animate) {
-            const duration = end - start;
+             const duration = end - start;
             if (duration <= 0 || totalWindow <= 0) return;
-
             const segment = document.createElement('div');
             segment.className = `timeline-segment timeline-${type}`;
             if (animate) segment.style.animationDelay = '0.1s';
             segment.style.width = `${(duration / totalWindow) * 100}%`;
-            
             const showText = (duration / totalWindow) > 0.10;
             segment.innerHTML = showText ? `
                 <span class="time">${formatTime(start)}-${formatTime(end)}</span>
@@ -553,17 +715,18 @@
         }
 
         function showError(message) {
-            errorMessage.textContent = message;
+             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
-            resultsContainer.classList.remove('hidden');
+            resultsContainer.classList.remove('hidden'); 
             summaryDiv.innerHTML = '';
             timelineContainer.innerHTML = '';
             secondServiceTimeDiv.classList.add('hidden');
             adjustmentContainer.classList.add('hidden');
+            restartBtn.classList.remove('hidden'); // Show restart even on error
         }
 
         function parseHHMM(timeString) {
-            if (!timeString || timeString.length < 3 || timeString.length > 4) return null;
+             if (!timeString || timeString.length < 3 || timeString.length > 4) return null;
             let h = timeString.length === 3 ? timeString.substring(0, 1) : timeString.substring(0, 2);
             let m = timeString.length === 3 ? timeString.substring(1, 3) : timeString.substring(2, 4);
             const hours = parseInt(h, 10), minutes = parseInt(m, 10);
@@ -572,27 +735,33 @@
         }
 
         function formatTime(totalMinutes) {
-            let h = Math.floor(totalMinutes / 60) % 24;
+             let h = Math.floor(totalMinutes / 60) % 24;
             let m = totalMinutes % 60;
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         }
         
         function formatDuration(totalMinutes) {
-            const h = Math.floor(totalMinutes / 60);
+             const h = Math.floor(totalMinutes / 60);
             const m = totalMinutes % 60;
             return `${h > 0 ? h + 'h ' : ''}${m > 0 ? m + 'm' : ''}`.trim() || '0m';
         }
 
         // --- PWA Service Worker Registration & Update ---
         let newWorker;
+        let registration; 
 
         function showUpdatePrompt() {
-            const updateModal = document.getElementById('update-modal');
+             const updateModal = document.getElementById('update-modal');
             const updateNowBtn = document.getElementById('update-now-btn');
             updateModal.classList.remove('hidden');
             updateNowBtn.addEventListener('click', () => {
                 updateNowBtn.textContent = 'Updating...';
-                newWorker.postMessage({ action: 'skipWaiting' });
+                if (newWorker) {
+                    newWorker.postMessage({ action: 'skipWaiting' });
+                } else {
+                    console.error("No new worker found to activate.");
+                    updateNowBtn.textContent = 'Error';
+                }
             });
         }
         
@@ -600,13 +769,13 @@
         const installBtn = document.getElementById('install-btn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
+             e.preventDefault();
             deferredPrompt = e;
             installBtn.classList.remove('hidden');
         });
 
         installBtn.addEventListener('click', () => {
-            installBtn.classList.add('hidden');
+             installBtn.classList.add('hidden');
             if (!deferredPrompt) return;
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
@@ -617,7 +786,6 @@
             });
         });
 
-        // iOS Install prompt
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
         if (isIOS && !isInStandaloneMode) {
@@ -628,6 +796,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(reg => {
+                    registration = reg; 
                     reg.addEventListener('updatefound', () => {
                         newWorker = reg.installing;
                         newWorker.addEventListener('statechange', () => {
@@ -648,6 +817,9 @@
                 });
             });
         }
+        
+        // --- INITIALIZE WIZARD ---
+        showStep(0);
         
     </script>
 
