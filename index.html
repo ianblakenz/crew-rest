@@ -89,6 +89,12 @@
             border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-focus-ring);
         }
         .wizard-radio-input { display: none; } /* Hide actual radio */
+        .wizard-error {
+            color: #ef4444; /* text-red-500 */
+            font-size: 0.875rem;
+            text-align: center;
+            margin-top: 0.75rem;
+        }
 
         .previous-answer {
             text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem;
@@ -197,6 +203,7 @@
                     <div id="step-1" class="wizard-step">
                         <label for="wizard-startTime" class="wizard-label">Breaks start at:</label>
                         <input type="text" id="wizard-startTime" class="wizard-input" inputmode="numeric" pattern="\d{3,4}" placeholder="HHMM" maxlength="4">
+                        <p class="wizard-error hidden" id="startTime-error">Please enter a valid HHMM time.</p>
                         <div class="wizard-nav">
                             <button class="wizard-nav-btn back" disabled>Back</button>
                             <button class="wizard-nav-btn next">Next</button>
@@ -208,6 +215,7 @@
                         <div class="previous-answer"><span id="prev-startTime"></span></div>
                         <label for="wizard-endTime" class="wizard-label">Breaks end at:</label>
                         <input type="text" id="wizard-endTime" class="wizard-input" inputmode="numeric" pattern="\d{3,4}" placeholder="HHMM" maxlength="4">
+                        <p class="wizard-error hidden" id="endTime-error">Please enter a valid HHMM time.</p>
                         <div class="wizard-nav">
                             <button class="wizard-nav-btn back">Back</button>
                             <button class="wizard-nav-btn next">Next</button>
@@ -259,6 +267,7 @@
                             <label for="bufferOther" class="wizard-radio-label">Other</label>
                         </div>
                         <input type="number" id="wizard-buffer-other" class="wizard-input hidden" inputmode="numeric" placeholder="Enter mins" min="0" style="margin-top: 1rem;">
+                        <p class="wizard-error hidden" id="buffer-error">Please enter a valid number of minutes.</p>
                         <div class="wizard-nav">
                             <button class="wizard-nav-btn back">Back</button>
                             <button class="wizard-nav-btn next">Calculate</button>
@@ -339,9 +348,12 @@
         const wizardContainer = document.getElementById('wizard');
         const wizardSteps = wizardContainer.querySelectorAll('.wizard-step');
         const wizardStartTimeInput = document.getElementById('wizard-startTime');
+        const startTimeError = document.getElementById('startTime-error');
         const wizardEndTimeInput = document.getElementById('wizard-endTime');
+        const endTimeError = document.getElementById('endTime-error');
         const wizardBufferGroup = document.getElementById('wizard-buffer-group');
         const wizardBufferOtherInput = document.getElementById('wizard-buffer-other');
+        const bufferError = document.getElementById('buffer-error');
         
         // --- DOM ELEMENTS (Results) ---
         const resultsContainer = document.getElementById('results-container');
@@ -424,9 +436,9 @@
                 wizardBufferOtherInput.classList.toggle('hidden', bufferChoice !== 'other');
             }
 
-            const currentInput = wizardSteps[stepIndex].querySelector('input[type="text"], input[type="number"], input[type="radio"]:checked');
-            if (currentInput && (currentInput.type === 'text' || currentInput.type === 'number')) {
-                 setTimeout(() => currentInput.focus(), 50); 
+            const currentInput = wizardSteps[stepIndex].querySelector('input[type="text"], input[type="number"]');
+            if (currentInput) {
+                 setTimeout(() => currentInput.focus(), 100); // Increased to 100ms
             }
         }
 
@@ -444,12 +456,23 @@
         }
 
         function nextStep() {
+            let isValid = true;
             if (currentStep === 0) { 
                 formData.startTime = wizardStartTimeInput.value;
-                if (!parseHHMM(formData.startTime)) { alert('Please enter a valid Start Time (HHMM).'); return; }
+                if (!parseHHMM(formData.startTime)) {
+                    startTimeError.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    startTimeError.classList.add('hidden');
+                }
             } else if (currentStep === 1) { 
                 formData.endTime = wizardEndTimeInput.value;
-                 if (!parseHHMM(formData.endTime)) { alert('Please enter a valid End Time (HHMM).'); return; }
+                 if (!parseHHMM(formData.endTime)) {
+                    endTimeError.classList.remove('hidden');
+                    isValid = false;
+                 } else {
+                     endTimeError.classList.add('hidden');
+                 }
             } else if (currentStep === 2) { 
                 formData.numBreaks = document.querySelector('input[name="wizard-numBreaks"]:checked').value;
             } else if (currentStep === 3 && formData.numBreaks === '4') { 
@@ -458,11 +481,19 @@
                 const bufferChoice = document.querySelector('input[name="wizard-buffer-choice"]:checked').value;
                 if (bufferChoice === 'other') {
                     formData.buffer = wizardBufferOtherInput.value;
-                    if (isNaN(parseInt(formData.buffer)) || parseInt(formData.buffer) < 0) { alert('Please enter a valid Buffer time (minutes).'); return; }
+                    if (isNaN(parseInt(formData.buffer)) || parseInt(formData.buffer) < 0) {
+                        bufferError.classList.remove('hidden');
+                        isValid = false;
+                    } else {
+                        bufferError.classList.add('hidden');
+                    }
                 } else {
                     formData.buffer = bufferChoice;
+                    bufferError.classList.add('hidden');
                 }
             }
+
+            if (!isValid) return; // Stop if validation failed
 
             let nextStepIndex = currentStep + 1;
             
@@ -511,20 +542,34 @@
             const isOther = e.target.value === 'other';
             wizardBufferOtherInput.classList.toggle('hidden', !isOther);
             if (isOther) {
-                setTimeout(() => wizardBufferOtherInput.focus(), 50);
+                setTimeout(() => wizardBufferOtherInput.focus(), 100);
             }
         });
 
         wizardStartTimeInput.addEventListener('input', () => {
              if (wizardStartTimeInput.value.length === 4) {
-                 if (parseHHMM(wizardStartTimeInput.value)) nextStep();
-                 else alert('Please enter a valid Start Time (HHMM).');
+                 if (parseHHMM(wizardStartTimeInput.value)) {
+                     startTimeError.classList.add('hidden');
+                     nextStep();
+                 }
+                 else {
+                     startTimeError.classList.remove('hidden');
+                 }
+            } else {
+                 startTimeError.classList.add('hidden');
             }
         });
         wizardEndTimeInput.addEventListener('input', () => {
              if (wizardEndTimeInput.value.length === 4) {
-                  if (parseHHMM(wizardEndTimeInput.value)) nextStep();
-                  else alert('Please enter a valid End Time (HHMM).');
+                  if (parseHHMM(wizardEndTimeInput.value)) {
+                      endTimeError.classList.add('hidden');
+                      nextStep();
+                  }
+                  else {
+                       endTimeError.classList.remove('hidden');
+                  }
+            } else {
+                 endTimeError.classList.add('hidden');
             }
         });
         wizardContainer.addEventListener('change', (e) => {
