@@ -249,8 +249,16 @@
                     <!-- Step 5: Buffer Time -->
                     <div id="step-5" class="wizard-step hidden">
                         <div class="previous-answer"><span id="prev-patternOrBreaks"></span></div>
-                        <label for="wizard-buffer" class="wizard-label">Change over time (min):</label>
-                        <input type="number" id="wizard-buffer" class="wizard-input" inputmode="numeric" value="10" min="0">
+                        <label class="wizard-label">Change over time (min):</label>
+                        <div id="wizard-buffer-group" class="wizard-radio-group">
+                            <input type="radio" id="buffer5" name="wizard-buffer-choice" value="5" class="wizard-radio-input">
+                            <label for="buffer5" class="wizard-radio-label">5 min</label>
+                            <input type="radio" id="buffer10" name="wizard-buffer-choice" value="10" class="wizard-radio-input" checked>
+                            <label for="buffer10" class="wizard-radio-label">10 min</label>
+                            <input type="radio" id="bufferOther" name="wizard-buffer-choice" value="other" class="wizard-radio-input">
+                            <label for="bufferOther" class="wizard-radio-label">Other</label>
+                        </div>
+                        <input type="number" id="wizard-buffer-other" class="wizard-input hidden" inputmode="numeric" placeholder="Enter mins" min="0" style="margin-top: 1rem;">
                         <div class="wizard-nav">
                             <button class="wizard-nav-btn back">Back</button>
                             <button class="wizard-nav-btn next">Calculate</button>
@@ -332,7 +340,8 @@
         const wizardSteps = wizardContainer.querySelectorAll('.wizard-step');
         const wizardStartTimeInput = document.getElementById('wizard-startTime');
         const wizardEndTimeInput = document.getElementById('wizard-endTime');
-        const wizardBufferInput = document.getElementById('wizard-buffer');
+        const wizardBufferGroup = document.getElementById('wizard-buffer-group');
+        const wizardBufferOtherInput = document.getElementById('wizard-buffer-other');
         
         // --- DOM ELEMENTS (Results) ---
         const resultsContainer = document.getElementById('results-container');
@@ -410,6 +419,11 @@
             currentStep = stepIndex;
             updatePreviousAnswers();
             
+            if (stepIndex === 4) { // Step 5 (buffer)
+                const bufferChoice = document.querySelector('input[name="wizard-buffer-choice"]:checked').value;
+                wizardBufferOtherInput.classList.toggle('hidden', bufferChoice !== 'other');
+            }
+
             const currentInput = wizardSteps[stepIndex].querySelector('input[type="text"], input[type="number"], input[type="radio"]:checked');
             if (currentInput && (currentInput.type === 'text' || currentInput.type === 'number')) {
                  setTimeout(() => currentInput.focus(), 50); 
@@ -440,9 +454,14 @@
                 formData.numBreaks = document.querySelector('input[name="wizard-numBreaks"]:checked').value;
             } else if (currentStep === 3 && formData.numBreaks === '4') { 
                 formData.breakPattern = document.querySelector('input[name="wizard-breakPattern"]:checked').value;
-            } else if (currentStep === 4) { // *** BUG FIX: This now correctly listens to step 4 (index 4) ***
-                 formData.buffer = wizardBufferInput.value;
-                 if (isNaN(parseInt(formData.buffer)) || parseInt(formData.buffer) < 0) { alert('Please enter a valid Buffer time (minutes).'); return; }
+            } else if (currentStep === 4) {
+                const bufferChoice = document.querySelector('input[name="wizard-buffer-choice"]:checked').value;
+                if (bufferChoice === 'other') {
+                    formData.buffer = wizardBufferOtherInput.value;
+                    if (isNaN(parseInt(formData.buffer)) || parseInt(formData.buffer) < 0) { alert('Please enter a valid Buffer time (minutes).'); return; }
+                } else {
+                    formData.buffer = bufferChoice;
+                }
             }
 
             let nextStepIndex = currentStep + 1;
@@ -485,6 +504,14 @@
                 nextStep();
             } else if (e.target.classList.contains('back')) {
                 prevStep();
+            }
+        });
+
+        wizardBufferGroup.addEventListener('change', (e) => {
+            const isOther = e.target.value === 'other';
+            wizardBufferOtherInput.classList.toggle('hidden', !isOther);
+            if (isOther) {
+                setTimeout(() => wizardBufferOtherInput.focus(), 50);
             }
         });
 
@@ -533,7 +560,9 @@
             wizardEndTimeInput.value = '';
             document.getElementById('wizard-numBreaks2').checked = true;
             document.getElementById('wizard-patternSSLL').checked = true;
-            wizardBufferInput.value = '10';
+            document.getElementById('buffer10').checked = true;
+            wizardBufferOtherInput.value = '';
+            wizardBufferOtherInput.classList.add('hidden');
             // Hide results, show wizard at step 0
             resultsContainer.classList.add('hidden');
             restartBtn.classList.add('hidden'); // Hide restart button again
