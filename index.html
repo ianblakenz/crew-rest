@@ -249,7 +249,7 @@
                     <!-- Step 5: Buffer Time -->
                     <div id="step-5" class="wizard-step hidden">
                         <div class="previous-answer"><span id="prev-patternOrBreaks"></span></div>
-                        <label for="wizard-buffer" class="wizard-label">Change-over per Break (mins):</label>
+                        <label for="wizard-buffer" class="wizard-label">Change over time (min):</label>
                         <input type="number" id="wizard-buffer" class="wizard-input" inputmode="numeric" value="10" min="0">
                         <div class="wizard-nav">
                             <button class="wizard-nav-btn back">Back</button>
@@ -273,7 +273,7 @@
             </div>
             
             <div id="results-container" class="results-container hidden">
-                 <h2>Schedule Overview</h2>
+                 <h2>Break Overview</h2>
                  <div id="errorMessage" class="hidden"></div>
                  <div id="summary" class="animated-item"></div>
                  <div id="timeline-container" class="timeline-container animated-item" style="animation-delay: 0.1s;"></div>
@@ -297,7 +297,7 @@
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <p>Version 1.0.4</p>
+             <p>Version 1.0.5</p>
         </footer>
     </div>
     
@@ -366,7 +366,7 @@
         let adjustmentOffset = 0;
         let minOffset = 0;
         let maxOffset = 0;
-        const ADJUSTMENT_INCREMENT = 10; // Changed to 10 minutes
+        const ADJUSTMENT_INCREMENT = 10; 
 
         // --- Function moved to global scope ---
         function updateAdjustedBreaks() {
@@ -440,7 +440,7 @@
                 formData.numBreaks = document.querySelector('input[name="wizard-numBreaks"]:checked').value;
             } else if (currentStep === 3 && formData.numBreaks === '4') { 
                 formData.breakPattern = document.querySelector('input[name="wizard-breakPattern"]:checked').value;
-            } else if (currentStep === (formData.numBreaks === '4' ? 4 : 3)) { 
+            } else if (currentStep === 4) { // *** BUG FIX: This now correctly listens to step 4 (index 4) ***
                  formData.buffer = wizardBufferInput.value;
                  if (isNaN(parseInt(formData.buffer)) || parseInt(formData.buffer) < 0) { alert('Please enter a valid Buffer time (minutes).'); return; }
             }
@@ -536,6 +536,7 @@
             wizardBufferInput.value = '10';
             // Hide results, show wizard at step 0
             resultsContainer.classList.add('hidden');
+            restartBtn.classList.add('hidden'); // Hide restart button again
             wizardContainer.classList.remove('hidden');
             showStep(0);
         });
@@ -588,11 +589,9 @@
                 const sortedBreaks = [...durations].sort((a,b) => a-b);
                 initialFourBreakDurations = [sortedBreaks[0], sortedBreaks[1], sortedBreaks[2], sortedBreaks[3]];
                 
-                // Max offset: How much can be taken from shorts (cannot go below 5 mins)
                 maxOffset = Math.floor(sortedBreaks[0] - 5 + sortedBreaks[1] - 5);
                 maxOffset = Math.floor(maxOffset / ADJUSTMENT_INCREMENT) * ADJUSTMENT_INCREMENT; 
 
-                // Min offset: How much can be taken from longs (shorts cannot become longer than longs)
                 minOffset = -Math.floor(((sortedBreaks[2] + sortedBreaks[3]) - (sortedBreaks[0] + sortedBreaks[1])) / 2);
                 minOffset = Math.ceil(minOffset / ADJUSTMENT_INCREMENT) * ADJUSTMENT_INCREMENT; 
 
@@ -655,7 +654,6 @@
             const totalAvailableTime = endMinutes - startMinutes;
             const netBreakTime = durations.reduce((a,b) => a+b, 0); 
             
-             // Check for invalid durations *before* displaying
              if (durations.some(d => d <= 0)) {
                  showError("Adjustment resulted in invalid break time (<= 0 minutes).");
                  return;
@@ -664,7 +662,7 @@
             let summaryHtml = `
                 <p>Total Window<span class="font-semibold">${formatDuration(totalAvailableTime)}</span></p>
                 <p>Total Breaks<span class="font-semibold">${formatDuration(netBreakTime)}</span></p>
-                <p>Total Change-over<span class="font-semibold">${formatDuration(totalBufferTime)}</span></p>
+                <p>Total Change Over<span class="font-semibold">${formatDuration(totalBufferTime)}</span></p>
             `;
             if (numBreaks === 4) {
                 const sortedBreaks = [...durations].sort((a,b)=>a-b);
@@ -677,6 +675,7 @@
             summaryDiv.innerHTML = summaryHtml;
             let currentBreakStartTime = startMinutes;
             durations.forEach((duration, i) => {
+                if (duration <= 0) return;
                 const breakStart = currentBreakStartTime;
                 const breakEnd = breakStart + duration;
                 addTimelineSegment(breakStart, breakEnd, 'break', `Break ${i+1}`, totalAvailableTime, animate);
