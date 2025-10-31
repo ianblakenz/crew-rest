@@ -132,8 +132,12 @@
         
         /* --- NEW PILL SUMMARY --- */
         #summary { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
-            text-align: left; color: #475569; margin-bottom: 1.5rem; 
+            display: grid; 
+            grid-template-columns: 1fr; /* Stack on one column */
+            gap: 0.75rem;
+            text-align: left; 
+            color: #475569; 
+            margin-bottom: 1.5rem; 
         }
         #summary p {
             background-color: #f8fafc; border: 1px solid #e2e8f0;
@@ -144,7 +148,9 @@
             font-weight: 800; color: #1e293b; display: block; 
             font-size: 1.125rem; margin-top: 0.25rem;
         }
-        #summary .summary-sl { grid-column: span 2; text-align: center; }
+        #summary .summary-sl { 
+            text-align: left; /* Align left */
+        }
 
         /* --- NEW TIMELINE STYLES --- */
         .timeline-container { 
@@ -158,9 +164,19 @@
             animation: fadeIn 0.5s ease-in-out;
             height: 100%; /* Full height for breaks */
             border-radius: 0.5rem;
+            overflow: hidden; /* Prevent text overflow */
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
-        .timeline-segment .time { font-weight: 700; font-size: 0.8rem; }
-        .timeline-segment .duration { font-size: 0.7rem; opacity: 0.8; }
+        .timeline-segment .time { 
+            font-weight: 700; font-size: 0.75rem; 
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .timeline-segment .duration { 
+            font-size: 0.65rem; 
+            opacity: 0.8; 
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
         .timeline-break { background-color: var(--primary-color); }
         .timeline-buffer {
             background-color: #64748b;
@@ -194,6 +210,24 @@
             border-radius: 9999px;
         }
         
+        /* --- NEW BUFFER ITEM STYLE --- */
+        .buffer-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b; /* text-slate-500 */
+            margin: -0.25rem 0; /* Pull breaks closer */
+            animation: slideInUp 0.5s ease-out;
+        }
+        .buffer-item svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2.5;
+        }
+
         #second-service-time { 
             text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1;
             font-weight: 700; /* Bolded */
@@ -437,7 +471,7 @@
         let adjustmentOffset = 0;
         let minOffset = 0;
         let maxOffset = 0;
-        const ADJUSTMENT_INCREMENT = 5; // Changed to 5 minutes
+        const ADJUSTMENT_INCREMENT = 5; 
 
         // --- Function moved to global scope ---
         function updateAdjustedBreaks() {
@@ -862,7 +896,8 @@
                 const l1 = sortedBreaks[2], l2 = sortedBreaks[3];
                 let shortSummary = s1 === s2 ? formatDuration(s1) : `${formatDuration(s1)} & ${formatDuration(s2)}`;
                 let longSummary = l1 === l2 ? formatDuration(l1) : `${formatDuration(l1)} & ${formatDuration(l2)}`;
-                summaryHtml += `<p class="summary-sl">S: <span class="font-semibold">${shortSummary}</span> | L: <span class="font-semibold">${longSummary}</span></p>`;
+                summaryHtml += `<p class="summary-sl">Short: <span class="font-semibold">${shortSummary}</span></p>
+                                <p class="summary-sl">Long: <span class="font-semibold">${longSummary}</span></p>`;
             }
             summaryDiv.innerHTML = summaryHtml;
             let currentBreakStartTime = startMinutes;
@@ -871,9 +906,10 @@
                 const breakStart = currentBreakStartTime;
                 const breakEnd = breakStart + duration;
                 addTimelineSegment(breakStart, breakEnd, 'break', `Break ${i+1}`, totalAvailableTime, animate);
-                if (i < numBreaks - 1) { // Only add buffer if it's not the last break
-                    addTimelineSegment(breakEnd, breakEnd + buffer, 'buffer', `Buffer`, totalAvailableTime, animate);
-                }
+                
+                // Add Buffer to timeline (ALWAYS)
+                addTimelineSegment(breakEnd, breakEnd + buffer, 'buffer', `Buffer`, totalAvailableTime, animate);
+
                 const listItem = document.createElement('li');
                 listItem.className = 'result-item';
                 if (animate) listItem.style.animationDelay = `${0.2 + i * 0.1}s`;
@@ -885,6 +921,17 @@
                     <span class="result-item-duration">${formatDuration(duration)}</span>
                 `;
                 resultsList.appendChild(listItem);
+
+                // Add Buffer list item (ALWAYS)
+                const bufferItem = document.createElement('li');
+                bufferItem.className = 'buffer-item';
+                if (animate) bufferItem.style.animationDelay = `${0.2 + i * 0.1 + 0.05}s`;
+                bufferItem.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>${formatDuration(buffer)} Change Over</span>
+                `;
+                resultsList.appendChild(bufferItem);
+
                 currentBreakStartTime = breakEnd + buffer;
             });
             const serviceStartTimeValueEl = document.getElementById('service-start-time-value');
@@ -903,10 +950,10 @@
             if (type === 'buffer') {
                 segment.innerHTML = `<span>${formatDuration(duration)}</span>`;
             } else {
-                const showText = (duration / totalWindow) > 0.15; // Need more space for break text
-                segment.innerHTML = showText ? `
+                const showText = true; // Always show text
+                segment.innerHTML = `
                     <span class="time">${formatTime(start)}-${formatTime(end)}</span>
-                    <span class="duration">${formatDuration(duration)}</span>` : '';
+                    <span class="duration">${formatDuration(duration)}</span>`;
             }
             segment.title = `${label}: ${formatTime(start)} - ${formatTime(end)} (${formatDuration(duration)})`;
             timelineContainer.appendChild(segment);
