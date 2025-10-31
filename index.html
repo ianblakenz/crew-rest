@@ -10,6 +10,11 @@
     <meta name="theme-color" content="#ffffff"/>
     <link rel="apple-touch-icon" href="https://placehold.co/192x192/002a6c/ffffff?text=Rest&font=inter">
     
+    <!-- Load new font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         /* --- Basic Reset & Font --- */
         :root {
@@ -19,7 +24,7 @@
             --primary-light-bg: #e6eaf0;
         }
         body {
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
             margin: 0;
             background-color: #f1f5f9; /* bg-slate-100 */
             display: flex;
@@ -46,7 +51,7 @@
         /* --- Header --- */
         .header { text-align: center; margin-bottom: 2rem; }
         .header .logo { display: block; margin-left: auto; margin-right: auto; height: 48px; margin-bottom: 1rem; }
-        .header h1 { font-size: 1.875rem; font-weight: 700; color: #1e293b; margin: 0; }
+        .header h1 { font-size: 1.875rem; font-weight: 800; color: #1e293b; margin: 0; }
         .install-button {
             background-color: #16a34a; color: white; font-weight: 600; padding: 0.5rem 1rem;
             border-radius: 9999px; border: none; cursor: pointer; margin-top: 1rem; transition: all 0.2s;
@@ -73,10 +78,10 @@
 
         /* --- WIZARD STYLES --- */
         .wizard-step { padding: 1rem 0; animation: fadeIn 0.3s ease-out; }
-        .wizard-label { display: block; font-size: 1.125rem; /* text-lg */ font-weight: 600; color: var(--primary-color); margin-bottom: 1rem; text-align: center; }
+        .wizard-label { display: block; font-size: 1.125rem; /* text-lg */ font-weight: 700; color: var(--primary-color); margin-bottom: 1rem; text-align: center; }
         .wizard-input {
             width: 100%; padding: 1rem; font-size: 1.25rem; /* text-xl */ background-color: #f8fafc;
-            border: 2px solid #cbd5e1; border-radius: 0.5rem; text-align: center;
+            border: 2px solid #cbd5e1; border-radius: 0.5rem; text-align: center; font-weight: 600;
         }
         .wizard-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-focus-ring); }
         .wizard-radio-group { display: flex; gap: 1rem; justify-content: center; }
@@ -99,12 +104,13 @@
         .previous-answer {
             text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem;
             border-bottom: 1px dashed #cbd5e1; color: #64748b; font-size: 0.9rem;
+            line-height: 1.6;
         }
         .previous-answer strong { color: #334155; font-weight: 600; }
         
         .wizard-nav { display: flex; justify-content: space-between; margin-top: 2rem; }
         .wizard-nav-btn {
-            padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; border: none;
+            padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 700; border: none;
             cursor: pointer; transition: all 0.2s; min-width: 100px;
         }
         .wizard-nav-btn.back { background-color: #e2e8f0; color: #475569; }
@@ -115,48 +121,91 @@
 
 
         /* --- Form (Hidden but used for calculations) --- */
-        #restForm { display: none; } /* Keep the form but hide it */
-        .form-input { /* Styles for hidden form inputs */
-             width: 100%; padding: 0.75rem 1rem; background-color: #f8fafc; border: 1px solid #cbd5e1;
-            border-radius: 0.5rem; transition: all 0.3s;
-        }
+        #restForm { display: none; } 
         
         /* --- Results Section --- */
         .results-container { padding: 1.5rem; border-top: 1px solid #e2e8f0; }
         @media (min-width: 640px) { .results-container { padding: 2rem; } }
         
-        .results-container h2 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin: 0 0 1.5rem 0; text-align: center; }
-        #errorMessage { color: #ef4444; text-align: center; margin-bottom: 1rem; font-weight: 500; }
-        #summary { text-align: center; color: #475569; margin-bottom: 1.5rem; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; }
-        #summary p { margin: 0; }
-        #summary .font-semibold { font-weight: 600; color: #1e293b; display: block; font-size: 1.125rem; }
+        .results-container h2 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; text-align: center; }
+        #errorMessage { color: #ef4444; text-align: center; margin-bottom: 1rem; font-weight: 600; }
+        
+        /* --- NEW PILL SUMMARY --- */
+        #summary { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
+            text-align: left; color: #475569; margin-bottom: 1.5rem; 
+        }
+        #summary p {
+            background-color: #f8fafc; border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem; border-radius: 0.75rem; margin: 0;
+            font-size: 0.8rem; font-weight: 600;
+        }
+        #summary .font-semibold { 
+            font-weight: 800; color: #1e293b; display: block; 
+            font-size: 1.125rem; margin-top: 0.25rem;
+        }
+        #summary .summary-sl { grid-column: span 2; text-align: center; }
 
-        /* --- VISUAL TIMELINE --- */
-        .timeline-container { display: flex; width: 100%; height: 70px; background-color: #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); }
-        .timeline-segment { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; padding: 0.25rem; box-sizing: border-box; animation: fadeIn 0.5s ease-in-out; }
-        .timeline-segment .time { font-weight: 600; font-size: 0.8rem; }
+        /* --- NEW TIMELINE STYLES --- */
+        .timeline-container { 
+            display: flex; width: 100%; height: 50px; 
+            overflow: hidden; margin-top: 2rem; /* Moved to bottom */
+            align-items: center; /* Center items vertically */
+        }
+        .timeline-segment { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; color: white; padding: 0.25rem; box-sizing: border-box;
+            animation: fadeIn 0.5s ease-in-out;
+            height: 100%; /* Full height for breaks */
+            border-radius: 0.5rem;
+        }
+        .timeline-segment .time { font-weight: 700; font-size: 0.8rem; }
         .timeline-segment .duration { font-size: 0.7rem; opacity: 0.8; }
         .timeline-break { background-color: var(--primary-color); }
-        .timeline-buffer { background-color: #64748b; }
+        .timeline-buffer {
+            background-color: #64748b;
+            height: 20px; /* Shorter "pill" */
+            min-width: 30px; /* Ensure pill shape */
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 9999px; /* Pill shape */
+            margin: 0 -10px; /* Overlap breaks slightly */
+            z-index: 10;
+        }
+        .timeline-buffer .time { display: none; } /* Hide time in buffer pill */
 
         #results-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; }
-        .result-item { background-color: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; animation: slideInUp 0.5s ease-out; }
-        .result-item-number { background-color: var(--primary-light-bg); color: var(--primary-color); font-size: 0.875rem; font-weight: 600; margin-right: 0.75rem; width: 1.75rem; height: 1.75rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; }
-        .result-item-time { font-weight: 600; }
-        .result-item-duration { font-size: 0.875rem; font-weight: 500; color: #16a34a; }
+        .result-item { 
+            background-color: #f8fafc; padding: 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between; animation: slideInUp 0.5s ease-out;
+        }
+        .result-item-number { 
+            background-color: var(--primary-light-bg); color: var(--primary-color); font-size: 0.875rem; font-weight: 700;
+            margin-right: 1rem; width: 2rem; height: 2rem; border-radius: 9999px;
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .result-item-time { font-weight: 700; }
         
-        #second-service-time { text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; }
+        /* --- NEW DURATION PILL --- */
+        .result-item-duration {
+            font-size: 0.875rem; font-weight: 600; color: #15803d; /* dark green */
+            background-color: #dcfce7; /* green-100 */
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+        }
+        
+        #second-service-time { 
+            text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1;
+            font-weight: 700; /* Bolded */
+        }
         #service-start-time-value { color: var(--primary-color); }
 
         /* --- ADJUSTMENT CONTROLS --- */
         #adjustment-container { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed #cbd5e1; animation: fadeIn 0.5s ease-in-out; }
         .adjust-btn-group { display: flex; justify-content: space-around; align-items: center; gap: 1rem; }
         .adjust-btn {
-            flex-grow: 1; /* Make buttons take up space */
-            padding: 0.75rem 1rem;
-            background-color: var(--primary-light-bg);
-            color: var(--primary-color);
-            font-weight: 600; font-size: 0.9rem;
+            flex-grow: 1; padding: 0.75rem 1rem; background-color: var(--primary-light-bg);
+            color: var(--primary-color); font-weight: 700; font-size: 0.9rem;
             border-radius: 0.5rem; border: 1px solid var(--primary-color);
             cursor: pointer; transition: all 0.2s;
         }
@@ -165,11 +214,11 @@
             opacity: 0.4; cursor: not-allowed;
             background-color: #e5e7eb; color: #9ca3af; border-color: #d1d5db;
         }
-        #adjustment-display { font-size: 1.125rem; font-weight: 600; color: #334155; min-width: 50px; text-align: center; flex-shrink: 0; }
+        #adjustment-display { font-size: 1.125rem; font-weight: 700; color: #334155; min-width: 50px; text-align: center; flex-shrink: 0; }
         
         .restart-button {
             display: block; width: 100%; margin-top: 2rem; background-color: #ef4444; color: white;
-            font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none;
+            font-weight: 700; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none;
             cursor: pointer; transition: all 0.2s;
         }
         .restart-button:hover { background-color: #dc2626; }
@@ -212,7 +261,7 @@
 
                     <!-- Step 2: End Time -->
                     <div id="step-2" class="wizard-step hidden">
-                        <div class="previous-answer"><span id="prev-startTime"></span></div>
+                        <div class="previous-answer" id="step-2-summary"></div>
                         <label for="wizard-endTime" class="wizard-label">Breaks end at:</label>
                         <input type="text" id="wizard-endTime" class="wizard-input" inputmode="numeric" pattern="\d{3,4}" placeholder="HHMM" maxlength="4">
                         <p class="wizard-error hidden" id="endTime-error">Please enter a valid HHMM time.</p>
@@ -224,10 +273,10 @@
 
                     <!-- Step 3: Number of Breaks -->
                     <div id="step-3" class="wizard-step hidden">
-                        <div class="previous-answer"><span id="prev-endTime"></span></div>
+                        <div class="previous-answer" id="step-3-summary"></div>
                         <label class="wizard-label">Number of Breaks:</label>
                         <div class="wizard-radio-group">
-                            <input type="radio" id="wizard-numBreaks2" name="wizard-numBreaks" value="2" class="wizard-radio-input" checked>
+                            <input type="radio" id="wizard-numBreaks2" name="wizard-numBreaks" value="2" class="wizard-radio-input">
                             <label for="wizard-numBreaks2" class="wizard-radio-label">2 Breaks</label>
                             <input type="radio" id="wizard-numBreaks4" name="wizard-numBreaks" value="4" class="wizard-radio-input">
                             <label for="wizard-numBreaks4" class="wizard-radio-label">4 Breaks</label>
@@ -240,10 +289,10 @@
 
                     <!-- Step 4: Break Pattern (Conditional) -->
                     <div id="step-4" class="wizard-step hidden">
-                         <div class="previous-answer"><span id="prev-numBreaks"></span></div>
+                         <div class="previous-answer" id="step-4-summary"></div>
                         <label class="wizard-label">Break Pattern:</label>
                         <div class="wizard-radio-group">
-                            <input type="radio" id="wizard-patternSSLL" name="wizard-breakPattern" value="SSLL" class="wizard-radio-input" checked>
+                            <input type="radio" id="wizard-patternSSLL" name="wizard-breakPattern" value="SSLL" class="wizard-radio-input">
                             <label for="wizard-patternSSLL" class="wizard-radio-label">S-S-L-L</label>
                             <input type="radio" id="wizard-patternSLLS" name="wizard-breakPattern" value="SLLS" class="wizard-radio-input">
                             <label for="wizard-patternSLLS" class="wizard-radio-label">S-L-L-S</label>
@@ -256,18 +305,18 @@
 
                     <!-- Step 5: Buffer Time -->
                     <div id="step-5" class="wizard-step hidden">
-                        <div class="previous-answer"><span id="prev-patternOrBreaks"></span></div>
+                        <div class="previous-answer" id="step-5-summary"></div>
                         <label class="wizard-label">Change over time (min):</label>
                         <div id="wizard-buffer-group" class="wizard-radio-group">
                             <input type="radio" id="buffer5" name="wizard-buffer-choice" value="5" class="wizard-radio-input">
                             <label for="buffer5" class="wizard-radio-label">5 min</label>
-                            <input type="radio" id="buffer10" name="wizard-buffer-choice" value="10" class="wizard-radio-input" checked>
+                            <input type="radio" id="buffer10" name="wizard-buffer-choice" value="10" class="wizard-radio-input">
                             <label for="buffer10" class="wizard-radio-label">10 min</label>
                             <input type="radio" id="bufferOther" name="wizard-buffer-choice" value="other" class="wizard-radio-input">
                             <label for="bufferOther" class="wizard-radio-label">Other</label>
                         </div>
                         <input type="number" id="wizard-buffer-other" class="wizard-input hidden" inputmode="numeric" placeholder="Enter mins" min="0" style="margin-top: 1rem;">
-                        <p class="wizard-error hidden" id="buffer-error">Please enter a valid number of minutes.</p>
+                        <p class="wizard-error hidden" id="buffer-error">Please select a time or enter a valid number.</p>
                         <div class="wizard-nav">
                             <button class="wizard-nav-btn back">Back</button>
                             <button class="wizard-nav-btn next">Calculate</button>
@@ -293,20 +342,21 @@
                  <h2>Break Overview</h2>
                  <div id="errorMessage" class="hidden"></div>
                  <div id="summary" class="animated-item"></div>
-                 <div id="timeline-container" class="timeline-container animated-item" style="animation-delay: 0.1s;"></div>
                  <ul id="results-list" class="results-list"></ul>
 
+                 <div id="timeline-container" class="timeline-container animated-item" style="animation-delay: 0.1s;"></div>
+                 
                  <div id="adjustment-container" class="hidden">
                     <label class="form-label text-center">Adjust breaks</label>
                     <div class="adjust-btn-group">
-                        <button id="minus-btn" class="adjust-btn">-10m</button>
+                        <button id="minus-btn" class="adjust-btn">-5m</button>
                         <span id="adjustment-display" class="text-lg font-bold">0m</span>
-                        <button id="plus-btn" class="adjust-btn">+10m</button>
+                        <button id="plus-btn" class="adjust-btn">+5m</button>
                     </div>
                  </div>
 
                  <div id="second-service-time" class="hidden animated-item result-item mt-6" style="animation-delay: 0.3s; justify-content: center; flex-direction: column; padding: 1.5rem;">
-                    <p class="text-slate-600 font-medium">Second Service Starts At:</p>
+                    <p class="text-slate-600" style="font-weight: 700;">Second Service Starts At:</p>
                     <p id="service-start-time-value" class="text-2xl font-bold mt-1"></p>
                  </div>
                  
@@ -373,9 +423,9 @@
         const formData = {
             startTime: '',
             endTime: '',
-            numBreaks: '2',
-            breakPattern: 'SSLL',
-            buffer: '10'
+            numBreaks: '',
+            breakPattern: '',
+            buffer: ''
         };
         const totalSteps = 4; 
 
@@ -387,7 +437,7 @@
         let adjustmentOffset = 0;
         let minOffset = 0;
         let maxOffset = 0;
-        const ADJUSTMENT_INCREMENT = 10; 
+        const ADJUSTMENT_INCREMENT = 5; // Changed to 5 minutes
 
         // --- Function moved to global scope ---
         function updateAdjustedBreaks() {
@@ -401,9 +451,7 @@
             const new_l1 = l1 + Math.floor(transfer / 2);
             const new_l2 = l2 + (transfer - Math.floor(transfer / 2));
 
-            // Prevent breaks from going below a minimum (e.g., 5 mins)
             if (new_s1 < 5 || new_s2 < 5 || new_l1 < 5 || new_l2 < 5) {
-                // Revert adjustment if it makes breaks too short
                 adjustmentOffset -= (adjustmentOffset > 0 ? ADJUSTMENT_INCREMENT : -ADJUSTMENT_INCREMENT);
                 updateButtonStates();
                 return; 
@@ -432,28 +480,44 @@
             updatePreviousAnswers();
             
             if (stepIndex === 4) { // Step 5 (buffer)
-                const bufferChoice = document.querySelector('input[name="wizard-buffer-choice"]:checked').value;
-                wizardBufferOtherInput.classList.toggle('hidden', bufferChoice !== 'other');
+                const bufferChoice = document.querySelector('input[name="wizard-buffer-choice"]:checked');
+                wizardBufferOtherInput.classList.toggle('hidden', !bufferChoice || bufferChoice.value !== 'other');
             }
 
             const currentInput = wizardSteps[stepIndex].querySelector('input[type="text"], input[type="number"]');
             if (currentInput) {
-                 setTimeout(() => currentInput.focus(), 100); // Increased to 100ms
+                 setTimeout(() => currentInput.focus(), 100); 
             }
         }
 
         function updatePreviousAnswers() {
-            document.getElementById('prev-startTime').innerHTML = formData.startTime ? `Start Time: <strong>${formatTime(parseHHMM(formData.startTime).hours * 60 + parseHHMM(formData.startTime).minutes)}</strong>` : '';
-            document.getElementById('prev-endTime').innerHTML = formData.endTime ? `End Time: <strong>${formatTime(parseHHMM(formData.endTime).hours * 60 + parseHHMM(formData.endTime).minutes)}</strong>` : '';
-            document.getElementById('prev-numBreaks').innerHTML = `Breaks: <strong>${formData.numBreaks}</strong>`;
+            const summaryElementId = `step-${currentStep + 1}-summary`;
+            const summaryEl = document.getElementById(summaryElementId);
             
-            const patternOrBreaksEl = document.getElementById('prev-patternOrBreaks');
-            if(formData.numBreaks === '4') {
-                patternOrBreaksEl.innerHTML = `Pattern: <strong>${formData.breakPattern}</strong>`;
-            } else {
-                 patternOrBreaksEl.innerHTML = `Breaks: <strong>${formData.numBreaks}</strong>`;
+            if (summaryEl) {
+                let summaryHtml = [];
+                if (formData.startTime) {
+                    summaryHtml.push(`Start: <strong>${formatTime(parseHHMM(formData.startTime).hours * 60 + parseHHMM(formData.startTime).minutes)}</strong>`);
+                }
+                if (formData.endTime) {
+                    summaryHtml.push(`End: <strong>${formatTime(parseHHMM(formData.endTime).hours * 60 + parseHHMM(formData.endTime).minutes)}</strong>`);
+                }
+                if (formData.numBreaks) {
+                    summaryHtml.push(`Breaks: <strong>${formData.numBreaks}</strong>`);
+                }
+                if (formData.numBreaks === '4' && formData.breakPattern) {
+                    summaryHtml.push(`Pattern: <strong>${formData.breakPattern}</strong>`);
+                }
+                
+                if (summaryHtml.length > 0) {
+                    summaryEl.innerHTML = summaryHtml.join(' &nbsp; | &nbsp; ');
+                    summaryEl.classList.remove('hidden');
+                } else {
+                    summaryEl.classList.add('hidden');
+                }
             }
         }
+
 
         function nextStep() {
             let isValid = true;
@@ -474,22 +538,40 @@
                      endTimeError.classList.add('hidden');
                  }
             } else if (currentStep === 2) { 
-                formData.numBreaks = document.querySelector('input[name="wizard-numBreaks"]:checked').value;
+                const checkedBreak = document.querySelector('input[name="wizard-numBreaks"]:checked');
+                if (!checkedBreak) {
+                    isValid = false; // Wait for user to tap Next
+                } else {
+                    formData.numBreaks = checkedBreak.value;
+                }
             } else if (currentStep === 3 && formData.numBreaks === '4') { 
-                formData.breakPattern = document.querySelector('input[name="wizard-breakPattern"]:checked').value;
+                const checkedPattern = document.querySelector('input[name="wizard-breakPattern"]:checked');
+                 if (!checkedPattern) {
+                    isValid = false; // Wait for user to tap Next
+                } else {
+                    formData.breakPattern = checkedPattern.value;
+                }
             } else if (currentStep === 4) {
-                const bufferChoice = document.querySelector('input[name="wizard-buffer-choice"]:checked').value;
-                if (bufferChoice === 'other') {
-                    formData.buffer = wizardBufferOtherInput.value;
-                    if (isNaN(parseInt(formData.buffer)) || parseInt(formData.buffer) < 0) {
-                        bufferError.classList.remove('hidden');
-                        isValid = false;
+                const bufferChoiceEl = document.querySelector('input[name="wizard-buffer-choice"]:checked');
+                if (!bufferChoiceEl) {
+                     bufferError.textContent = 'Please select a change over time.';
+                     bufferError.classList.remove('hidden');
+                     isValid = false;
+                } else {
+                     const bufferChoice = bufferChoiceEl.value;
+                     if (bufferChoice === 'other') {
+                        formData.buffer = wizardBufferOtherInput.value;
+                        if (isNaN(parseInt(formData.buffer)) || parseInt(formData.buffer) < 0) {
+                            bufferError.textContent = 'Please enter a valid number of minutes.';
+                            bufferError.classList.remove('hidden');
+                            isValid = false;
+                        } else {
+                            bufferError.classList.add('hidden');
+                        }
                     } else {
+                        formData.buffer = bufferChoice;
                         bufferError.classList.add('hidden');
                     }
-                } else {
-                    formData.buffer = bufferChoice;
-                    bufferError.classList.add('hidden');
                 }
             }
 
@@ -498,6 +580,7 @@
             let nextStepIndex = currentStep + 1;
             
             if (currentStep === 2 && formData.numBreaks === '2') {
+                formData.breakPattern = ''; // Clear pattern if 2 breaks
                 nextStepIndex = 4; // Jump directly to Buffer
             }
 
@@ -543,6 +626,8 @@
             wizardBufferOtherInput.classList.toggle('hidden', !isOther);
             if (isOther) {
                 setTimeout(() => wizardBufferOtherInput.focus(), 100);
+            } else {
+                 bufferError.classList.add('hidden');
             }
         });
 
@@ -573,7 +658,13 @@
             }
         });
         wizardContainer.addEventListener('change', (e) => {
-            if (e.target.type === 'radio' && (e.target.name === 'wizard-numBreaks' || e.target.name === 'wizard-breakPattern')) {
+             if (e.target.type === 'radio' && e.target.name === 'wizard-buffer-choice') {
+                 const isOther = e.target.value === 'other';
+                 wizardBufferOtherInput.classList.toggle('hidden', !isOther);
+                 if (isOther) {
+                    setTimeout(() => wizardBufferOtherInput.focus(), 100);
+                 }
+            } else if (e.target.type === 'radio' && (e.target.name === 'wizard-numBreaks' || e.target.name === 'wizard-breakPattern')) {
                 setTimeout(nextStep, 100); 
             }
         });
@@ -594,23 +685,35 @@
         });
 
         restartBtn.addEventListener('click', () => {
-            // Reset form data object
             formData.startTime = '';
             formData.endTime = '';
-            formData.numBreaks = '2';
-            formData.breakPattern = 'SSLL';
-            formData.buffer = '10';
-            // Reset wizard input fields
+            formData.numBreaks = '';
+            formData.breakPattern = '';
+            formData.buffer = '';
             wizardStartTimeInput.value = '';
             wizardEndTimeInput.value = '';
-            document.getElementById('wizard-numBreaks2').checked = true;
-            document.getElementById('wizard-patternSSLL').checked = true;
-            document.getElementById('buffer10').checked = true;
+            
+            const numBreaks2 = document.getElementById('wizard-numBreaks2');
+            const numBreaks4 = document.getElementById('wizard-numBreaks4');
+            if (numBreaks2) numBreaks2.checked = false;
+            if (numBreaks4) numBreaks4.checked = false;
+            
+            const patternSSLL = document.getElementById('wizard-patternSSLL');
+            const patternSLLS = document.getElementById('wizard-patternSLLS');
+            if (patternSSLL) patternSSLL.checked = false;
+            if (patternSLLS) patternSLLS.checked = false;
+
+            const buffer5 = document.getElementById('buffer5');
+            const buffer10 = document.getElementById('buffer10');
+            const bufferOther = document.getElementById('bufferOther');
+            if (buffer5) buffer5.checked = false;
+            if (buffer10) buffer10.checked = false;
+            if (bufferOther) bufferOther.checked = false;
+
             wizardBufferOtherInput.value = '';
             wizardBufferOtherInput.classList.add('hidden');
-            // Hide results, show wizard at step 0
             resultsContainer.classList.add('hidden');
-            restartBtn.classList.add('hidden'); // Hide restart button again
+            restartBtn.classList.add('hidden'); 
             wizardContainer.classList.remove('hidden');
             showStep(0);
         });
@@ -679,42 +782,57 @@
                 
                 adjustmentContainer.classList.remove('hidden');
             }
-             restartBtn.classList.remove('hidden'); // Show restart button after calculation
+             restartBtn.classList.remove('hidden'); 
         }
         
         force3HourBtnOriginal.addEventListener('click', () => calculateAndDisplay({ force3Hour: true }));
 
         function calculateDurations(netBreakTime, numBreaks, force3Hour) {
-             if (numBreaks === 2) {
-                const breakDuration = Math.floor(netBreakTime / 2);
-                return [breakDuration + (netBreakTime % 2), breakDuration];
+            // Round the total net break time down to the nearest 5-minute mark
+            const cleanNetBreakTime = Math.floor(netBreakTime / 5) * 5;
+
+            if (numBreaks === 2) {
+                let breakDuration = Math.floor(cleanNetBreakTime / 2);
+                // Ensure break duration is a multiple of 5
+                breakDuration = Math.floor(breakDuration / 5) * 5;
+                const remainder = cleanNetBreakTime - (breakDuration * 2);
+                return [breakDuration + remainder, breakDuration]; // Put remainder on first break
             } 
+            
             if (force3Hour) {
-                if (netBreakTime < 360) return null;
+                if (cleanNetBreakTime < 360) return null;
                 let l1 = 180, l2 = 180;
-                let remaining = netBreakTime - 360;
+                let remaining = cleanNetBreakTime - 360;
                 let s1 = Math.floor(remaining / 2);
                 let s2 = remaining - s1;
+                // Round short breaks to nearest 5
+                s1 = Math.floor(s1 / 5) * 5;
+                s2 = cleanNetBreakTime - 360 - s1;
+                
                 if (s1 >= 180) {
                     const excess = (s1 - 180) + (s2 - 180);
                     s1 = 180; s2 = 180;
-                    l1 += Math.floor(excess / 2);
-                    l2 += excess - Math.floor(excess / 2);
+                    let excessHalf = Math.floor(excess / 2);
+                    l1 += excessHalf;
+                    l2 += excess - excessHalf;
                 }
                 const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
                 return (pattern === 'SSLL') ? [s1, s2, l1, l2] : [s1, l1, l2, s2];
             } 
-            let idealShort = Math.floor(netBreakTime / 6);
-            let breaks = [idealShort, idealShort, 2 * idealShort, 2 * idealShort];
-            let remainder = netBreakTime - breaks.reduce((a, b) => a + b, 0);
-            for (let i = 0; i < remainder; i++) breaks[3 - (i % 4)]++;
-            let excess = 0;
-            breaks.forEach((br, i) => { if (br > 180) { excess += br - 180; breaks[i] = 180; } });
-            if (excess > 0) {
-                breaks.sort((a, b) => a - b);
-                breaks[0] += Math.floor(excess / 2);
-                breaks[1] += excess - Math.ceil(excess / 2);
+            
+            // Default 4-break logic with 5-minute rounding
+            let idealShort = Math.floor((cleanNetBreakTime / 6) / 5) * 5;
+            let remainingTime = cleanNetBreakTime - (2 * idealShort);
+            let idealLong = Math.floor((remainingTime / 2) / 5) * 5;
+            
+            let breaks = [idealShort, idealShort, idealLong, idealLong];
+            let remainder = cleanNetBreakTime - breaks.reduce((a, b) => a + b, 0);
+
+            // Distribute remainder in 5-minute chunks
+            for (let i = 0; i < remainder; i += 5) {
+                breaks[3 - ((i/5) % 4)] += 5;
             }
+            
             breaks.sort((a, b) => a - b);
             const pattern = document.querySelector('input[name="breakPattern"]:checked').value;
             return (pattern === 'SSLL') ? [breaks[0], breaks[1], breaks[2], breaks[3]] : [breaks[0], breaks[2], breaks[3], breaks[1]];
@@ -744,7 +862,7 @@
                 const l1 = sortedBreaks[2], l2 = sortedBreaks[3];
                 let shortSummary = s1 === s2 ? formatDuration(s1) : `${formatDuration(s1)} & ${formatDuration(s2)}`;
                 let longSummary = l1 === l2 ? formatDuration(l1) : `${formatDuration(l1)} & ${formatDuration(l2)}`;
-                summaryHtml += `<p style="flex-basis: 100%; margin-top: 0.5rem;">S: ${shortSummary} | L: ${longSummary}</p>`;
+                summaryHtml += `<p class="summary-sl">S: <span class="font-semibold">${shortSummary}</span> | L: <span class="font-semibold">${longSummary}</span></p>`;
             }
             summaryDiv.innerHTML = summaryHtml;
             let currentBreakStartTime = startMinutes;
@@ -753,7 +871,9 @@
                 const breakStart = currentBreakStartTime;
                 const breakEnd = breakStart + duration;
                 addTimelineSegment(breakStart, breakEnd, 'break', `Break ${i+1}`, totalAvailableTime, animate);
-                addTimelineSegment(breakEnd, breakEnd + buffer, 'buffer', `Buffer`, totalAvailableTime, animate);
+                if (i < numBreaks - 1) { // Only add buffer if it's not the last break
+                    addTimelineSegment(breakEnd, breakEnd + buffer, 'buffer', `Buffer`, totalAvailableTime, animate);
+                }
                 const listItem = document.createElement('li');
                 listItem.className = 'result-item';
                 if (animate) listItem.style.animationDelay = `${0.2 + i * 0.1}s`;
@@ -762,7 +882,7 @@
                         <span class="result-item-number">${i + 1}</span>
                         <p class="result-item-time">${formatTime(breakStart)} - ${formatTime(breakEnd)}</p>
                     </div>
-                    <div class="result-item-duration">${formatDuration(duration)}</div>
+                    <span class="result-item-duration">${formatDuration(duration)}</span>
                 `;
                 resultsList.appendChild(listItem);
                 currentBreakStartTime = breakEnd + buffer;
@@ -779,10 +899,15 @@
             segment.className = `timeline-segment timeline-${type}`;
             if (animate) segment.style.animationDelay = '0.1s';
             segment.style.width = `${(duration / totalWindow) * 100}%`;
-            const showText = (duration / totalWindow) > 0.10;
-            segment.innerHTML = showText ? `
-                <span class="time">${formatTime(start)}-${formatTime(end)}</span>
-                <span class="duration">${formatDuration(duration)}</span>` : '';
+            
+            if (type === 'buffer') {
+                segment.innerHTML = `<span>${formatDuration(duration)}</span>`;
+            } else {
+                const showText = (duration / totalWindow) > 0.15; // Need more space for break text
+                segment.innerHTML = showText ? `
+                    <span class="time">${formatTime(start)}-${formatTime(end)}</span>
+                    <span class="duration">${formatDuration(duration)}</span>` : '';
+            }
             segment.title = `${label}: ${formatTime(start)} - ${formatTime(end)} (${formatDuration(duration)})`;
             timelineContainer.appendChild(segment);
         }
@@ -795,7 +920,7 @@
             timelineContainer.innerHTML = '';
             secondServiceTimeDiv.classList.add('hidden');
             adjustmentContainer.classList.add('hidden');
-            restartBtn.classList.remove('hidden'); // Show restart even on error
+            restartBtn.classList.remove('hidden'); 
         }
 
         function parseHHMM(timeString) {
