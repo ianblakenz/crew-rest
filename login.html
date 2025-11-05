@@ -62,7 +62,7 @@
         .login-input {
             width: 100%; padding: 0.875rem; font-size: 1rem; background-color: #f8fafc;
             border: 2px solid #cbd5e1; border-radius: 0.5rem; font-weight: 600;
-            box-sizing: border-box; /* Ensures padding doesn't break layout */
+            box-sizing: border-box; 
         }
         .login-input:focus { 
             outline: none; border-color: var(--primary-color); 
@@ -79,6 +79,42 @@
             color: #ef4444; font-size: 0.875rem;
             margin-top: 1rem; display: none; /* Hidden by default */
         }
+        
+        /* --- UPDATE MODAL --- */
+        .update-modal-overlay {
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.6); display: flex;
+            align-items: center; justify-content: center; z-index: 50; animation: fadeIn 0.3s ease;
+        }
+        .update-modal-box {
+            background-color: white; border-radius: 1rem; padding: 2rem; width: 90%;
+            max-width: 380px; text-align: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        .update-modal-box h2 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin: 0 0 0.5rem 0; }
+        .update-modal-box p { color: #475569; margin: 0 0 1.5rem 0; }
+        .update-now-btn {
+            width: 100%; background-color: #f59e0b; color: white; font-weight: 600; padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; border: none; cursor: pointer; transition: all 0.2s;
+        }
+        .update-now-btn:hover { background-color: #d97706; }
+
+        /* --- iOS Install Prompt CSS (FIX) --- */
+        #ios-install-prompt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 42, 108, 0.95);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+        }
+        #ios-install-prompt p { margin: 0; }
+        #ios-install-prompt .share-icon { display: inline-block; vertical-align: middle; width: 1.2em; height: 1.2em; margin: 0 0.2rem; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -174,14 +210,13 @@
                 }
             });
 
-            // --- PWA Installation Logic (Same as index.html) ---
+            // --- PWA Installation Logic ---
             let deferredPrompt;
-            const installBtn = document.getElementById('install-btn'); // Note: This button doesn't exist on this page
             
             window.addEventListener('beforeinstallprompt', (e) => {
                  e.preventDefault();
                 deferredPrompt = e;
-                if(installBtn) installBtn.classList.remove('hidden');
+                // We don't have an install button on the login page, but this captures the event
             });
 
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -191,7 +226,7 @@
                 iosPrompt.classList.remove('hidden');
             }
 
-            // --- PWA Update Logic (Same as index.html) ---
+            // --- PWA Update Logic ---
             let newWorker;
             let registration; 
             
