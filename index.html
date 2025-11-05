@@ -435,7 +435,6 @@
         const resultsList = document.getElementById('results-list');
         const errorMessage = document.getElementById('errorMessage');
         const summaryDiv = document.getElementById('summary');
-        // const timelineContainer = document.getElementById('timeline-container'); // Removed
         const secondServiceTimeDiv = document.getElementById('second-service-time');
         const adjustmentControls = document.getElementById('adjustment-controls');
         const adjustmentContainer = document.getElementById('adjustment-container');
@@ -941,9 +940,9 @@
             errorMessage.classList.remove('hidden');
             resultsContainer.classList.remove('hidden'); 
             summaryDiv.innerHTML = '';
-            if (timelineContainer) {
-                timelineContainer.innerHTML = ''; // This element was removed
-            }
+            // if (timelineContainer) {  // This element was removed
+            //     timelineContainer.innerHTML = ''; 
+            // }
             secondServiceTimeDiv.classList.add('hidden');
             adjustmentContainer.classList.add('hidden');
             restartBtn.classList.remove('hidden'); 
