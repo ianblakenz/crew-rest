@@ -1,1 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inflight Rest Calculator - Login</title>
+    <!-- PWA Manifest and Theme Color -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff"/>
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/002a6c/ffffff?text=Rest&font=inter">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #002a6c;
+            --primary-hover: #001f50;
+            --primary-focus-ring: #b3c2d9;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            margin: 0;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #334155;
+            padding: 1rem;
+        }
+        .container { width: 100%; max-width: 28rem; margin: 0 auto; }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+        .header .logo { 
+            display: block; margin-left: auto; margin-right: auto; 
+            height: 48px; margin-bottom: 1.5rem; 
+        }
+        .login-label { 
+            font-size: 1.125rem; font-weight: 700; color: var(--primary-color); 
+            margin-bottom: 1.5rem; 
+        }
+        .input-group {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+        .login-input {
+            width: 100%; padding: 0.875rem; font-size: 1rem; background-color: #f8fafc;
+            border: 2px solid #cbd5e1; border-radius: 0.5rem; font-weight: 600;
+            box-sizing: border-box; /* Ensures padding doesn't break layout */
+        }
+        .login-input:focus { 
+            outline: none; border-color: var(--primary-color); 
+            box-shadow: 0 0 0 3px var(--primary-focus-ring); 
+        }
+        .login-btn {
+            width: 100%; background-color: var(--primary-color); color: white; font-weight: 700; 
+            padding: 1rem 1.5rem; border-radius: 0.5rem; border: none;
+            cursor: pointer; transition: all 0.2s; margin-top: 1.5rem; font-size: 1rem;
+        }
+        .login-btn:hover { background-color: var(--primary-hover); }
+        .login-btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        .login-error {
+            color: #ef4444; font-size: 0.875rem;
+            margin-top: 1rem; display: none; /* Hidden by default */
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
 
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <img src="https://media.faaa.com.au/logo/faaa_logo.png" alt="FAAA Logo" class="logo">
+            </div>
+
+            <label class="login-label">Member Access</label>
+            
+            <div class="input-group">
+                <label for="email" class="input-label">Email</label>
+                <input type="email" id="email" class="login-input" placeholder="your.email@example.com">
+            </div>
+
+            <div class="input-group">
+                <label for="staff-number" class="input-label">Staff Number</label>
+                <input type="text" id="staff-number" class="login-input" placeholder="e.g., 123456">
+            </div>
+            
+            <p class="login-error" id="login-error">Invalid credentials. Please try again.</p>
+            <button id="login-btn" class="login-btn">Sign In</button>
+        </div>
+    </div>
+
+    <!-- UPDATE MODAL (Same as index.html) -->
+    <div id="update-modal" class="hidden update-modal-overlay">
+        <div class="update-modal-box">
+            <h2>Update Available</h2>
+            <p>A new version of the app is ready. Update now to get the latest features.</p>
+            <button id="update-now-btn" class="update-now-btn">Update Now</button>
+        </div>
+    </div>
+
+    <!-- iOS Install Prompt (Same as index.html) -->
+    <div id="ios-install-prompt" class="hidden">
+         <p>To install this app, tap the <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="share-icon"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> icon and then 'Add to Home Screen'.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginBtn = document.getElementById('login-btn');
+            const emailInput = document.getElementById('email');
+            const staffNumberInput = document.getElementById('staff-number');
+            const loginError = document.getElementById('login-error');
+            
+            // Check if user is already logged in
+            if (localStorage.getItem('is-authenticated') === 'true') {
+                window.location.href = './index.html';
+                return;
+            }
+
+            loginBtn.addEventListener('click', async () => {
+                const email = emailInput.value.trim().toLowerCase();
+                const staffNumber = staffNumberInput.value.trim();
+                
+                if (email === "" || staffNumber === "") {
+                    loginError.textContent = "Please enter both fields.";
+                    loginError.style.display = 'block';
+                    return;
+                }
+
+                loginError.textContent = "Checking credentials...";
+                loginError.style.display = 'block';
+                loginBtn.disabled = true;
+
+                try {
+                    // This function URL will be provided by Cloudflare
+                    const response = await fetch('/check-user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, staffNumber })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // User is valid! Save their "pass" and redirect.
+                        localStorage.setItem('is-authenticated', 'true');
+                        window.location.href = './index.html'; // Redirect to the calculator
+                    } else {
+                        // User is invalid
+                        loginError.textContent = "Invalid credentials. Please try again.";
+                        loginBtn.disabled = false;
+                    }
+                } catch (err) {
+                    console.error('Login error:', err);
+                    loginError.textContent = "Error connecting to server. Please try again.";
+                    loginBtn.disabled = false;
+                }
+            });
+
+            // --- PWA Installation Logic (Same as index.html) ---
+            let deferredPrompt;
+            const installBtn = document.getElementById('install-btn'); // Note: This button doesn't exist on this page
+            
+            window.addEventListener('beforeinstallprompt', (e) => {
+                 e.preventDefault();
+                deferredPrompt = e;
+                if(installBtn) installBtn.classList.remove('hidden');
+            });
+
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+            const iosPrompt = document.getElementById('ios-install-prompt');
+            if (isIOS && !isInStandaloneMode && iosPrompt) {
+                iosPrompt.classList.remove('hidden');
+            }
+
+            // --- PWA Update Logic (Same as index.html) ---
+            let newWorker;
+            let registration; 
+            
+            function showUpdatePrompt() {
+                 const updateModal = document.getElementById('update-modal');
+                 const updateNowBtn = document.getElementById('update-now-btn');
+                 if(updateModal && updateNowBtn) {
+                    updateModal.classList.remove('hidden');
+                    updateNowBtn.addEventListener('click', () => {
+                        updateNowBtn.textContent = 'Updating...';
+                        if (newWorker) {
+                            newWorker.postMessage({ action: 'skipWaiting' });
+                        }
+                    });
+                 }
+            }
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    registration = reg; 
+                    reg.addEventListener('updatefound', () => {
+                        newWorker = reg.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                showUpdatePrompt();
+                            }
+                        });
+                    });
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+
+                let refreshing;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    window.location.reload();
+                    refreshing = true;
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

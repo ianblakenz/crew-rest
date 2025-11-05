@@ -1,9 +1,11 @@
-const CACHE_NAME = 'inflight-rest-cache-v22'; // Version bumped to v14
+const CACHE_NAME = 'inflight-rest-cache-v23'; // Version bumped to v21
 const urlsToCache = [
-  './', // Cache the root (usually redirects to index.html)
+  './',
   './index.html',
   './manifest.json',
-  'https://media.faaa.com.au/logo/faaa_logo.png'
+  'https://media.faaa.com.au/logo/faaa_logo.png',
+  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap'
+  // Font files (like .woff2) will be cached on-the-fly by the fetch listener
 ];
 
 self.addEventListener('install', event => {
@@ -14,17 +16,14 @@ self.addEventListener('install', event => {
         // Use addAll - if any request fails, the promise rejects.
         return cache.addAll(urlsToCache)
           .catch(error => {
-            console.error('Failed to cache resources during install:', error);
-            // Optional: You could try caching individually here if addAll fails
-            // but for core app files, failure usually means something is wrong.
+            console.warn('Failed to cache some resources during install. App may not work fully offline.', error);
           });
       })
       .then(() => {
-        console.log('All resources cached successfully.');
+        console.log('Core resources cached.');
         return self.skipWaiting(); // Activate immediately
       })
       .catch(error => {
-        // If caching fails critically, the SW won't install correctly.
         console.error('Service worker installation failed:', error);
       })
   );
@@ -49,51 +48,53 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Cache-first strategy - Reliably serve from cache when offline
+// Stale-while-revalidate for Google Fonts, Cache-first for everything else
 self.addEventListener('fetch', event => {
-  // Only handle GET requests and requests within the app's origin
-  if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin) && !urlsToCache.includes(event.request.url) ) {
-     // Let the browser handle non-GET or external requests normally
-    return;
+  const requestUrl = new URL(event.request.url);
+
+  // Stale-While-Revalidate for Google Fonts
+  if (requestUrl.hostname === 'fonts.googleapis.com' || requestUrl.hostname === 'fonts.gstatic.com') {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(cache => {
+        return cache.match(event.request).then(cachedResponse => {
+          const networkFetch = fetch(event.request).then(networkResponse => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          }).catch(() => cachedResponse); // Fallback to cache on network error
+          
+          return cachedResponse || networkFetch; // Return from cache first, or wait for network
+        });
+      })
+    );
+    return; // Don't run the cache-first logic below
   }
 
+  // Cache-First for all other app requests
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
         if (cachedResponse) {
-          // Cache hit - return response
-          // console.log('Serving from cache:', event.request.url);
           return cachedResponse;
         }
 
-        // Not in cache, fetch from network
-        // console.log('Fetching from network:', event.request.url);
+        // Not in cache, fetch from network, then cache it
         return fetch(event.request).then(
           networkResponse => {
-            // Check if we received a valid response
             if (!networkResponse || networkResponse.status !== 200 || (networkResponse.type !== 'basic' && networkResponse.type !== 'cors')) {
               console.log('Fetch failed or invalid response for:', event.request.url, networkResponse);
-              return networkResponse; // Return the error response
+              return networkResponse;
             }
-
-            // IMPORTANT: Clone the response. A response is a stream
-            // and because we want the browser to consume the response
-            // as well as the cache consuming the response, we need
-            // to clone it so we have two streams.
             const responseToCache = networkResponse.clone();
-
             caches.open(CACHE_NAME)
               .then(cache => {
-                // console.log('Caching new resource:', event.request.url);
                 cache.put(event.request, responseToCache);
               });
-
             return networkResponse;
           }
         ).catch(error => {
-            console.error('Fetch failed, and not in cache:', error);
-            // Optional: Return a custom offline fallback page/response here
-            // For now, just let the browser show its offline error
+            console.error('Fetch failed, and not in cache:', error, event.request.url);
         });
       })
   );
@@ -104,4 +105,3 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
-
