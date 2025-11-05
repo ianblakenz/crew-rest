@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inflight-rest-cache-v39'; // Version bumped to v21
+const CACHE_NAME = 'inflight-rest-cache-v40'; // Version bumped to v21
 const urlsToCache = [
   './',
   './index.html',
@@ -106,30 +106,3 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// ... (all the existing code in sw.js)
-
-// *** ADD THIS NEW EVENT LISTENER AT THE END ***
-
-// Handle notification click
-self.addEventListener('notificationclick', event => {
-  event.notification.close(); // Close the notification
-
-  // This opens the app, or focuses it if it's already open
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
-      // Check if the app window is already open
-      if (clientList.length > 0) {
-        let client = clientList[0];
-        // Try to find a focused window
-        for (let i = 0; i < clientList.length; i++) {
-          if (clientList[i].focused) {
-            client = clientList[i];
-            break;
-          }
-        }
-        return client.focus(); // Focus the existing window
-      }
-      return clients.openWindow('./index.html'); // Or open a new one
-    })
-  );
-});

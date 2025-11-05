@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inflight Rest Calculator</title>
 
+    <!-- PWA Manifest and Theme Color -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff"/>
     <link rel="apple-touch-icon" href="https://media.faaa.com.au/apps/crew-rest.png">
     
+    <!-- Load new font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- This script is the new "pass" checker. It runs before anything else. -->
     <script>
         if (localStorage.getItem('is-authenticated') !== 'true') {
             // If the user does not have the "pass", send them back to the login page.
@@ -269,7 +272,9 @@
                     <button id="install-btn" class="hidden install-button">Add to Home Screen</button>
                 </div>
 
+                <!-- Step-by-Step Wizard Container -->
                 <div id="wizard">
+                    <!-- Step 1: Start Time -->
                     <div id="step-1" class="wizard-step">
                         <label for="wizard-startTime" class="wizard-label">Breaks start at:</label>
                         <input type="text" id="wizard-startTime" class="wizard-input" inputmode="numeric" pattern="\d{3,4}" placeholder="HHMM" maxlength="4">
@@ -280,6 +285,7 @@
                         </div>
                     </div>
 
+                    <!-- Step 2: End Time -->
                     <div id="step-2" class="wizard-step hidden">
                         <div class="previous-answer" id="step-2-summary"></div>
                         <label for="wizard-endTime" class="wizard-label">Breaks end at:</label>
@@ -291,6 +297,7 @@
                         </div>
                     </div>
 
+                    <!-- Step 3: Number of Breaks -->
                     <div id="step-3" class="wizard-step hidden">
                         <div class="previous-answer" id="step-3-summary"></div>
                         <label class="wizard-label">Number of Breaks:</label>
@@ -306,6 +313,7 @@
                         </div>
                     </div>
 
+                    <!-- Step 4: Break Pattern (Conditional) -->
                     <div id="step-4" class="wizard-step hidden">
                          <div class="previous-answer" id="step-4-summary"></div>
                         <label class="wizard-label">Break Pattern:</label>
@@ -321,6 +329,7 @@
                         </div>
                     </div>
 
+                    <!-- Step 5: Buffer Time -->
                     <div id="step-5" class="wizard-step hidden">
                         <div class="previous-answer" id="step-5-summary"></div>
                         <label class="wizard-label">Change over time (min):</label>
@@ -341,6 +350,7 @@
                     </div>
                 </div>
 
+                <!-- Hidden Original Form (for calculation logic) -->
                 <div id="restForm">
                     <input type="text" id="startTime">
                     <input type="text" id="endTime">
@@ -380,10 +390,11 @@
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <p>Version 1.0.9</p>
+             <p>Version 1.0.12</p>
         </footer>
     </div>
     
+    <!-- UPDATE MODAL -->
     <div id="update-modal" class="hidden update-modal-overlay">
         <div class="update-modal-box">
             <h2>Update Available</h2>
@@ -392,12 +403,13 @@
         </div>
     </div>
 
+    <!-- iOS Install Prompt -->
     <div id="ios-install-prompt" class="hidden">
         <p>To install this app, tap the <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="share-icon"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> icon and then 'Add to Home Screen'.</p>
     </div>
     
     <script>
-    window.addEventListener('load', () => { // Changed to 'load' to be 100% sure all elements are ready
+    document.addEventListener('DOMContentLoaded', () => {
         // --- DOM ELEMENTS (Original Form - hidden) ---
         const formStartTime = document.getElementById('startTime');
         const formEndTime = document.getElementById('endTime');
@@ -423,6 +435,7 @@
         const resultsList = document.getElementById('results-list');
         const errorMessage = document.getElementById('errorMessage');
         const summaryDiv = document.getElementById('summary');
+        // const timelineContainer = document.getElementById('timeline-container'); // Removed
         const secondServiceTimeDiv = document.getElementById('second-service-time');
         const adjustmentControls = document.getElementById('adjustment-controls');
         const adjustmentContainer = document.getElementById('adjustment-container');
@@ -735,8 +748,6 @@
         // --- MAIN CALCULATION & DISPLAY LOGIC ---
          function calculateAndDisplay(options = {}) {
             const { force3Hour = false } = options;
-            // *** THIS IS THE FIX FOR THE -5m/+5m BUTTONS: ***
-            // *** The line "adjustmentContainer.classList.add('hidden');" was DELETED from here. ***
             errorMessage.classList.add('hidden');
             adjustmentControls.classList.add('hidden'); // Hide controls by default
 
@@ -774,9 +785,6 @@
                 showError("Not enough time to make long breaks 3 hours.");
                 return;
             }
-            
-            // *** NEW: Ask for notification permission when results are shown ***
-            requestNotificationPermission();
 
             resultsContainer.classList.remove('hidden'); 
             displayResults(durations, totalStartMinutes, totalEndMinutes, buffer, true);
@@ -859,6 +867,7 @@
 
         function displayResults(durations, startMinutes, endMinutes, buffer, animate = false) {
             resultsList.innerHTML = '';
+            // timelineContainer.innerHTML = ''; // This element was removed
             const numBreaks = durations.length;
             const totalBufferTime = numBreaks * buffer;
             const totalAvailableTime = endMinutes - startMinutes;
@@ -890,23 +899,18 @@
                 const breakStart = currentBreakStartTime;
                 const breakEnd = breakStart + duration;
                 
+                // addTimelineSegment(breakStart, breakEnd, 'break', `Break ${i+1}`, totalAvailableTime, animate);
+                // addTimelineSegment(breakEnd, breakEnd + buffer, 'buffer', `Buffer`, totalAvailableTime, animate);
+
                 const listItem = document.createElement('li');
                 listItem.className = 'result-item';
                 if (animate) listItem.style.animationDelay = `${0.2 + i * 0.1}s`;
-                
-                // *** NEW: Updated list item HTML with alarm button ***
                 listItem.innerHTML = `
                     <div style="display: flex; align-items: center;">
                         <span class="result-item-number">${i + 1}</span>
                         <p class="result-item-time">${formatTime(breakStart)} - ${formatTime(breakEnd)}</p>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="result-item-duration">${formatDuration(duration)}</span>
-                        <button class="set-alarm-btn" data-break-number="${i + 1}" data-break-end="${breakEnd}" title="Set 10-min reminder" 
-                                style="background:none; border:none; cursor:pointer; padding:0.25rem; color:#64748b; outline:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        </button>
-                    </div>
+                    <span class="result-item-duration">${formatDuration(duration)}</span>
                 `;
                 resultsList.appendChild(listItem);
 
@@ -936,6 +940,10 @@
             errorMessage.classList.remove('hidden');
             resultsContainer.classList.remove('hidden'); 
             summaryDiv.innerHTML = '';
+            
+            // if (timelineContainer) {  // This element was removed
+            //     timelineContainer.innerHTML = ''; 
+            // }
             secondServiceTimeDiv.classList.add('hidden');
             adjustmentContainer.classList.add('hidden');
             restartBtn.classList.remove('hidden'); 
@@ -961,87 +969,6 @@
             const m = totalMinutes % 60;
             return `${h > 0 ? h + 'h ' : ''}${m > 0 ? m + 'm' : ''}`.trim() || '0m';
         }
-
-        // --- NEW: NOTIFICATION FUNCTIONS ---
-
-        /**
-         * Asks the user for permission to send notifications.
-         * Called when results are first shown.
-         */
-        function requestNotificationPermission() {
-            if (!('Notification' in window)) {
-                console.log('This browser does not support notifications.');
-                return;
-            }
-            if (Notification.permission === 'default') {
-                // We only ask if they haven't said no or yes already.
-                Notification.requestPermission();
-            }
-        }
-
-        /**
-         * Schedules the actual notification by asking for the current destination time.
-         * @param {number} breakNumber - The number of the break (e.g., 1, 2, 3, 4)
-         * @param {number} breakEndMinutes - The absolute end time in minutes-since-midnight (destination time).
-         */
-        function setBreakAlarm(breakNumber, breakEndMinutes) {
-            if (Notification.permission !== 'granted') {
-                alert('Please enable notifications for this app to set alarms.');
-                requestNotificationPermission(); // Re-ask
-                return;
-            }
-
-            const breakEndTimeString = formatTime(breakEndMinutes); // e.g., "14:00"
-            const warningTimeMinutes = breakEndMinutes - 10;      // e.g., 13:50 (in minutes)
-            const warningTimeString = formatTime(warningTimeMinutes); // e.g., "13:50"
-
-            // 1. Ask the user for the current time at the destination
-            const currentDestTimeInput = prompt(`Your 10-min warning will be at ${warningTimeString} local time.\n\nTo set the timer, what is the CURRENT local (destination) time?\n(Please enter in HHMM format)`);
-
-            if (currentDestTimeInput === null) {
-                return; // User clicked "Cancel"
-            }
-
-            // 2. Parse the time they entered
-            const parsedCurrentTime = parseHHMM(currentDestTimeInput);
-            if (!parsedCurrentTime) {
-                alert('Invalid Time. Please enter time in HHMM format.');
-                return;
-            }
-            const currentDestTimeMinutes = (parsedCurrentTime.hours * 60) + parsedCurrentTime.minutes;
-
-            // 3. Calculate the relative delay
-            //    (e.g., Warning at 830, Current is 630, Delay is 200 mins)
-            let delayInMinutes = warningTimeMinutes - currentDestTimeMinutes;
-            
-            // Handle day rollover (e.g., warning is 00:30, current time is 23:30)
-            if (delayInMinutes < -60) { // Arbitrary large negative to assume day rollover
-                 delayInMinutes += 24 * 60; // Add 24 hours
-            }
-
-            if (delayInMinutes <= 0) {
-                alert('The warning time for this break has already passed.');
-                return;
-            }
-
-            const delayInMs = delayInMinutes * 60 * 1000;
-
-            // 4. Schedule the notification using the relative delay
-            setTimeout(() => {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification('Break Ending Soon!', {
-                        body: `Your break (Break ${breakNumber}) ends in 10 minutes at ${breakEndTimeString}.`,
-                        icon: 'https://media.faaa.com.au/apps/crew-rest-faaa-app.png',
-                        vibrate: [200, 100, 200] // Vibrate pattern
-                    });
-                });
-            }, delayInMs);
-
-            // 5. Confirm to the user
-            alert(`Alarm set! You'll get a notification in ${delayInMinutes} minutes (10 mins before your break ends).`);
-        }
-        // --- END OF NEW NOTIFICATION FUNCTIONS ---
-
 
         // --- PWA Service Worker Registration & Update ---
         let newWorker;
@@ -1116,17 +1043,6 @@
             });
         }
         
-        // --- NEW: ADD THIS EVENT LISTENER for Alarm Buttons ---
-        resultsList.addEventListener('click', (e) => {
-            const alarmButton = e.target.closest('.set-alarm-btn');
-            if (alarmButton) {
-                const breakNumber = parseInt(alarmButton.dataset.breakNumber, 10);
-                const breakEndMinutes = parseInt(alarmButton.dataset.breakEnd, 10);
-                
-                setBreakAlarm(breakNumber, breakEndMinutes);
-            }
-        });
-
         // --- INITIALIZE WIZARD ---
         showStep(0);
     });
