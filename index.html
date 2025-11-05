@@ -62,11 +62,6 @@
         .header { text-align: center; margin-bottom: 2rem; }
         .header .logo { display: block; margin-left: auto; margin-right: auto; height: 48px; margin-bottom: 1rem; }
         .header h1 { font-size: 1.875rem; font-weight: 800; color: #1e293b; margin: 0; }
-        .install-button {
-            background-color: #16a34a; color: white; font-weight: 600; padding: 0.5rem 1rem;
-            border-radius: 9999px; border: none; cursor: pointer; margin-top: 1rem; transition: all 0.2s;
-        }
-        .install-button:hover { background-color: #15803d; }
         
         /* --- UPDATE MODAL --- */
         .update-modal-overlay {
@@ -269,7 +264,7 @@
                 <div class="header">
                     <img src="https://media.faaa.com.au/logo/faaa_logo.png" alt="FAAA Logo" class="logo">
                     <h1>Inflight Rest Calculator</h1>
-                    <button id="install-btn" class="hidden install-button">Add to Home Screen</button>
+                    <!-- Install button removed from here -->
                 </div>
 
                 <!-- Step-by-Step Wizard Container -->
@@ -390,7 +385,7 @@
             </div>
         </div>
         <footer class="text-center mt-4 text-xs text-slate-400">
-             <p>Version 1.0.8</p>
+             <p>Version 1.0.9</p>
         </footer>
     </div>
     
@@ -868,7 +863,9 @@
 
         function displayResults(durations, startMinutes, endMinutes, buffer, animate = false) {
             resultsList.innerHTML = '';
-            // timelineContainer.innerHTML = ''; // This element was removed
+            if (timelineContainer) {
+                timelineContainer.innerHTML = ''; // Clear timeline
+            }
             const numBreaks = durations.length;
             const totalBufferTime = numBreaks * buffer;
             const totalAvailableTime = endMinutes - startMinutes;
@@ -941,7 +938,9 @@
             errorMessage.classList.remove('hidden');
             resultsContainer.classList.remove('hidden'); 
             summaryDiv.innerHTML = '';
-            // timelineContainer.innerHTML = ''; // This element was removed
+            if (timelineContainer) {
+                timelineContainer.innerHTML = ''; // This element was removed
+            }
             secondServiceTimeDiv.classList.add('hidden');
             adjustmentContainer.classList.add('hidden');
             restartBtn.classList.remove('hidden'); 
@@ -993,26 +992,28 @@
         window.addEventListener('beforeinstallprompt', (e) => {
              e.preventDefault();
             deferredPrompt = e;
-            installBtn.classList.remove('hidden');
+            if(installBtn) installBtn.classList.remove('hidden');
         });
 
-        installBtn.addEventListener('click', () => {
-             installBtn.classList.add('hidden');
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the A2HS prompt');
-                }
-                deferredPrompt = null;
+        if(installBtn) {
+            installBtn.addEventListener('click', () => {
+                 installBtn.classList.add('hidden');
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
+                    }
+                    deferredPrompt = null;
+                });
             });
-        });
+        }
 
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
-        if (isIOS && !isInStandaloneMode) {
-            document.getElementById('install-btn').classList.add('hidden');
-            document.getElementById('ios-install-prompt').classList.remove('hidden');
+        const iosInstallPrompt = document.getElementById('ios-install-prompt');
+        if (isIOS && !isInStandaloneMode && iosInstallPrompt) {
+            iosInstallPrompt.classList.remove('hidden');
         }
 
         if ('serviceWorker' in navigator) {
