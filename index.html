@@ -8,7 +8,7 @@
     <!-- PWA Manifest and Theme Color -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff"/>
-    <link rel="apple-touch-icon" href="https://placehold.co/192x192/002a6c/ffffff?text=Rest&font=inter">
+    <link rel="apple-touch-icon" href="https://media.faaa.com.au/apps/crew-rest.png">
     
     <!-- Load new font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -435,7 +435,7 @@
         const resultsList = document.getElementById('results-list');
         const errorMessage = document.getElementById('errorMessage');
         const summaryDiv = document.getElementById('summary');
-        const timelineContainer = document.getElementById('timeline-container');
+        // const timelineContainer = document.getElementById('timeline-container'); // Removed
         const secondServiceTimeDiv = document.getElementById('second-service-time');
         const adjustmentControls = document.getElementById('adjustment-controls');
         const adjustmentContainer = document.getElementById('adjustment-container');
@@ -868,9 +868,7 @@
 
         function displayResults(durations, startMinutes, endMinutes, buffer, animate = false) {
             resultsList.innerHTML = '';
-            if (timelineContainer) {
-                timelineContainer.innerHTML = ''; // Clear timeline
-            }
+            // timelineContainer.innerHTML = ''; // This element was removed
             const numBreaks = durations.length;
             const totalBufferTime = numBreaks * buffer;
             const totalAvailableTime = endMinutes - startMinutes;
@@ -994,13 +992,13 @@
         let deferredPrompt;
         const installBtn = document.getElementById('install-btn');
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-             e.preventDefault();
-            deferredPrompt = e;
-            if(installBtn) installBtn.classList.remove('hidden');
-        });
-
         if(installBtn) {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                 e.preventDefault();
+                deferredPrompt = e;
+                installBtn.classList.remove('hidden');
+            });
+
             installBtn.addEventListener('click', () => {
                  installBtn.classList.add('hidden');
                 if (!deferredPrompt) return;
@@ -1018,6 +1016,7 @@
         const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
         const iosInstallPrompt = document.getElementById('ios-install-prompt');
         if (isIOS && !isInStandaloneMode && iosInstallPrompt) {
+            if(installBtn) installBtn.classList.add('hidden');
             iosInstallPrompt.classList.remove('hidden');
         }
 
