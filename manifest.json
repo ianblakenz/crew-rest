@@ -1,6 +1,6 @@
 {
-  "name": "FAAA Crew Rest",
-  "short_name": "FAAA Crew Rest",
+  "name": "Inflight Rest Calculator",
+  "short_name": "Rest Calc",
   "description": "A simple calculator for cabin crew rest periods.",
   "start_url": "./login.html",
   "display": "standalone",
@@ -8,12 +8,12 @@
   "theme_color": "#002a6c",
   "icons": [
     {
-      "src": "https://placehold.co/192x192@3x/002a6c/ffffff?text=FAAA\nCrew%20Rest&font=source-sans-pro",
+      "src": "https://media.faaa.com.au/apps/crew-rest.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://placehold.co/512x512@3x/002a6c/ffffff?text=FAAA\nCrew%20Rest&font=source-sans-pro",
+      "src": "https://media.faaa.com.au/apps/crew-rest.png",
       "sizes": "512x512",
       "type": "image/png"
     }
