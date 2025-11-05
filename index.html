@@ -409,7 +409,7 @@
     </div>
     
     <script>
-    window.addEventListener('load', () => { // Changed to 'load' to be 100% sure all elements are ready
+    document.addEventListener('DOMContentLoaded', () => {
         // --- DOM ELEMENTS (Original Form - hidden) ---
         const formStartTime = document.getElementById('startTime');
         const formEndTime = document.getElementById('endTime');
@@ -435,6 +435,7 @@
         const resultsList = document.getElementById('results-list');
         const errorMessage = document.getElementById('errorMessage');
         const summaryDiv = document.getElementById('summary');
+        // const timelineContainer = document.getElementById('timeline-container'); // Removed
         const secondServiceTimeDiv = document.getElementById('second-service-time');
         const adjustmentControls = document.getElementById('adjustment-controls');
         const adjustmentContainer = document.getElementById('adjustment-container');
@@ -747,7 +748,6 @@
         // --- MAIN CALCULATION & DISPLAY LOGIC ---
          function calculateAndDisplay(options = {}) {
             const { force3Hour = false } = options;
-            adjustmentContainer.classList.add('hidden');
             errorMessage.classList.add('hidden');
             adjustmentControls.classList.add('hidden'); // Hide controls by default
 
@@ -940,6 +940,7 @@
             errorMessage.classList.remove('hidden');
             resultsContainer.classList.remove('hidden'); 
             summaryDiv.innerHTML = '';
+            
             // if (timelineContainer) {  // This element was removed
             //     timelineContainer.innerHTML = ''; 
             // }
