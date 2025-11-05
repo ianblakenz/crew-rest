@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inflight-rest-cache-v36'; // Version bumped to v21
+const CACHE_NAME = 'inflight-rest-cache-v37'; // Version bumped to v21
 const urlsToCache = [
   './',
   './index.html',
