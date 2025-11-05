@@ -409,7 +409,7 @@
     </div>
     
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('load', () => { // Changed to 'load' to be 100% sure all elements are ready
         // --- DOM ELEMENTS (Original Form - hidden) ---
         const formStartTime = document.getElementById('startTime');
         const formEndTime = document.getElementById('endTime');
